@@ -1,0 +1,13 @@
+name: "Setup Bicep"
+description: "Installs the Bicep CLI"
+author: "Anthony Martin"
+branding:
+  icon: box
+  color: yellow
+inputs:
+  version:
+    required: false
+    description: "The version of Bicep to use (defaults to latest)"
+runs:
+  using: "node20"
+  main: "dist/index.js"

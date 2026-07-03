@@ -1,0 +1,119 @@
+name: Test Module
+run-name: "Test Module: ${{ inputs.module }} | Operation:${{ inputs.operation }}"
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: The path of the module to test.
+        required: true
+        type: choice
+        options:
+          - constructs/storage-account
+          - stamps/deployment-stamp
+
+      operation:
+        description: The operation to perform.
+        required: true
+        type: choice
+        options:
+          - test_using_deployment_stack
+          - what_if
+          - cleanup_deployment_stack
+        default: what_if
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  config:
+    name: Set Deployment Stack name
+    runs-on: ubuntu-latest
+    environment: RG
+    outputs:
+      DEPLOYMENT_STACK_NAME: ${{ steps.step1.outputs.DEPLOYMENT_STACK_NAME }}
+      REGION: ${{ steps.step1.outputs.REGION }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Log in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: "Set Deployment Stack name"
+        id: step1
+        run: |
+          LAST_PART=$(echo "${{ inputs.module }}" | awk -F'/' '{print $NF}')
+          DEPLOYMENT_STACK_NAME="${LAST_PART}-stack"
+          echo "DEPLOYMENT_STACK_NAME=${DEPLOYMENT_STACK_NAME}" >> "$GITHUB_OUTPUT"
+
+  test:
+    name: Test Module ${{ inputs.module }}
+    needs:
+      - config
+    runs-on: ubuntu-latest
+    environment: RG
+    steps:
+      - name: needs env
+        env:
+          DEPLOYMENT_STACK_NAME: ${{ needs.config.outputs.DEPLOYMENT_STACK_NAME }}
+        run: |
+          echo "$DEPLOYMENT_STACK_NAME"
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Log in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install Bicep CLI
+        uses: ./.github/actions/setup-bicep
+        with:
+          version: ${{ vars.BICEP_VERSION }}
+
+      - name: Deploy using Deployment Stack
+        id: deployment_stack
+        if: ${{ inputs.operation == 'test_using_deployment_stack' }}
+        run: |
+          az stack group create \
+          --name ${{ needs.config.outputs.DEPLOYMENT_STACK_NAME }} \
+          --resource-group ${{ vars.RESOURCE_GROUP }} \
+          --template-file "modules/${{ inputs.module }}/test/main.test.bicep" \
+          --parameters "modules/${{ inputs.module }}/test/main.test.pet.parameters.jsonc" \
+          --description 'Run by: ${{ github.actor }}' \
+          --action-on-unmanage "deleteResources" \
+          --deny-settings-mode None \
+          --output 'json'
+
+      - name: Deploy ARM Template (What-If)
+        id: arm_what_if
+        uses: Azure/arm-deploy@v2
+        if: ${{ inputs.operation == 'what_if' }}
+        with:
+          scope: resourcegroup
+          deploymentName: "GHA-TEST-${{ github.run_number }}"
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resourceGroupName: ${{ vars.RESOURCE_GROUP }}
+          region: ${{ vars.REGION }}
+          template: modules/${{ inputs.module }}/test/main.test.bicep
+          parameters: modules/${{ inputs.module }}/test/main.test.pet.parameters.jsonc
+          additionalArguments: --what-if
+          failOnStdErr: false
+
+      - name: Cleanup Deployment Stack
+        if: ${{ inputs.operation == 'cleanup_deployment_stack' }}
+        run: |
+          az stack group delete \
+          --name ${{ needs.config.outputs.DEPLOYMENT_STACK_NAME }} \
+          --resource-group ${{ vars.RESOURCE_GROUP }} \
+          --action-on-unmanage "deleteAll" \
+          --yes

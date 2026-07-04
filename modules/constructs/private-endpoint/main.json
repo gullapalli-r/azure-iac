@@ -1,0 +1,202 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.31.34.60546",
+      "templateHash": "17121016431713270442"
+    },
+    "name": "Private Endpoint",
+    "description": "Private Endpoint used for accessing private resources on internal networks",
+    "owner": "Gullapalli-R"
+  },
+  "parameters": {
+    "name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 64,
+      "metadata": {
+        "description": "The resource name."
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "The Geo-location where the resource lives."
+      }
+    },
+    "subnetId": {
+      "type": "string",
+      "metadata": {
+        "description": "The ID of the subnet from which the private IP will be allocated."
+      }
+    },
+    "serviceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource id of private link service (the service being linked privately)."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+      }
+    },
+    "endpointGroupId": {
+      "type": "string",
+      "allowedValues": [
+        "account",
+        "amlworkspace",
+        "API",
+        "application gateway",
+        "AzureBackup",
+        "azuremonitor",
+        "AzureSiteRecovery",
+        "batchAccount",
+        "blob",
+        "blob_secondary",
+        "browser_authentication",
+        "Cassandra",
+        "cluster",
+        "configurationStores",
+        "coordinator",
+        "databricks_ui_api",
+        "dataFactory",
+        "Dev",
+        "dfs",
+        "dfs_secondary",
+        "domain",
+        "DSCAndHybridWorker",
+        "empty",
+        "eventHub",
+        "fhir",
+        "file",
+        "File Sync Service",
+        "file_secondary",
+        "Gremlin",
+        "Gateway",
+        "hosting environment",
+        "hybridcompute",
+        "HSM",
+        "IoTApps",
+        "iotDps",
+        "iotHub",
+        "keydelivery",
+        "liveevent",
+        "managed disk",
+        "management",
+        "mariadbServer",
+        "MongoDB",
+        "mysqlServer",
+        "namespace",
+        "nodeManagement",
+        "portal",
+        "postgresqlServer",
+        "Power BI",
+        "project",
+        "queue",
+        "queue_secondary",
+        "redisCache",
+        "redisEnterprise",
+        "registry",
+        "ResourceManagement",
+        "searchService",
+        "signalr",
+        "sites",
+        "sites-slot-dev",
+        "sites-slot-qa",
+        "sites-slot-testing",
+        "sites-slot-staging",
+        "sites-slot-preprod",
+        "sites-slot-prod",
+        "SQL",
+        "SqlOnDemand",
+        "sqlServer",
+        "staticSites",
+        "streamingendpoint",
+        "Table",
+        "table",
+        "table_secondary",
+        "topic",
+        "vault",
+        "web",
+        "web_secondary",
+        "Webhook",
+        "webpubsub",
+        "grafana",
+        "prometheusMetrics",
+        "Bot",
+        "Token",
+        "AzureBackup",
+        "AzureSiteRecovery",
+        "managedEnvironments"
+      ],
+      "metadata": {
+        "description": "The ID of the group obtained from the remote resource that this private endpoint should connect to (https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview)."
+      }
+    },
+    "requiresManualApproval": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Whether or not manual approval for a Private Endpoint connection is required."
+      }
+    },
+    "manualApprovalRequestMessage": {
+      "type": "string",
+      "defaultValue": "",
+      "maxLength": 140,
+      "metadata": {
+        "description": "Message to pass on when requesting manual endpoint approval workflow."
+      }
+    }
+  },
+  "variables": {
+    "privateLinkServiceConnection": {
+      "name": "[parameters('name')]",
+      "properties": {
+        "privateLinkServiceId": "[parameters('serviceId')]",
+        "groupIds": [
+          "[parameters('endpointGroupId')]"
+        ],
+        "requestMessage": "[if(parameters('requiresManualApproval'), parameters('manualApprovalRequestMessage'), null())]"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2023-11-01",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "subnet": {
+          "id": "[parameters('subnetId')]"
+        },
+        "manualPrivateLinkServiceConnections": "[if(parameters('requiresManualApproval'), createArray(variables('privateLinkServiceConnection')), createArray())]",
+        "privateLinkServiceConnections": "[if(parameters('requiresManualApproval'), createArray(), createArray(variables('privateLinkServiceConnection')))]",
+        "customNetworkInterfaceName": "[format('{0}-NIC', parameters('name'))]"
+      }
+    }
+  ],
+  "outputs": {
+    "id": {
+      "type": "string",
+      "metadata": {
+        "description": "ID of the resource."
+      },
+      "value": "[resourceId('Microsoft.Network/privateEndpoints', parameters('name'))]"
+    },
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the resource."
+      },
+      "value": "[parameters('name')]"
+    }
+  }
+}

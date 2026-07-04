@@ -5,10 +5,10 @@
     "_generator": {
       "name": "bicep",
       "version": "0.31.34.60546",
-      "templateHash": "17121016431713270442"
+      "templateHash": "2378491791343824983"
     },
     "name": "Private Endpoint",
-    "description": "Private Endpoint used for accessing private resources on internal networks",
+    "description": "Private Endpoint used for accessing private resources on POC internal networks",
     "owner": "Gullapalli-R"
   },
   "parameters": {

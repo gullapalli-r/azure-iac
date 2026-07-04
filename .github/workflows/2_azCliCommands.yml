@@ -8,7 +8,7 @@ on:
         required: true
         type: choice
         options:
-          - rg-hub-eastus
+          - rg-iac-eastus
 
       command:
         description: Input az cli command

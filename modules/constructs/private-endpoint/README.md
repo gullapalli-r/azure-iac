@@ -1,6 +1,6 @@
 # Private Endpoint
 
-Private Endpoint used for accessing private resources on internal networks
+Private Endpoint used for accessing private resources on POC internal networks
 
 ## Details
 

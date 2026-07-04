@@ -1,5 +1,5 @@
 metadata name = 'Private Endpoint'
-metadata description = 'Private Endpoint used for accessing private resources on internal networks'
+metadata description = 'Private Endpoint used for accessing private resources on POC internal networks'
 metadata owner = 'Gullapalli-R'
 
 targetScope = 'resourceGroup'
@@ -133,7 +133,6 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
   name: name
   location: location
   tags: tags
-
   properties: {
     subnet: {
       id: subnetId
@@ -141,6 +140,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
     manualPrivateLinkServiceConnections: requiresManualApproval ? [ privateLinkServiceConnection ] : []
     privateLinkServiceConnections: requiresManualApproval ? [] : [ privateLinkServiceConnection ]
     customNetworkInterfaceName: '${name}-NIC'
+
   }
 }
 

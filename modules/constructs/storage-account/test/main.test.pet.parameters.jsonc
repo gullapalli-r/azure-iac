@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "nameHns": {
+      "value": "stbrmtest01"
+    },
+    "vnetResourceGroupName": {
+      "value": ""
+    },
+    "vnetName": {
+      "value": ""
+    },
+    "vnetSubnetName": {
+      "value": ""
+    },
+    "diagnosticLogWorkspaceId": {
+      "value": ""
+    },
+    "tags":{}
+  }
+}

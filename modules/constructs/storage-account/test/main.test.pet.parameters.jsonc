@@ -6,13 +6,13 @@
       "value": "stbrmtest01"
     },
     "vnetResourceGroupName": {
-      "value": ""
+      "value": "rg-iac-eastus"
     },
     "vnetName": {
-      "value": ""
+      "value": "SPOKE-IaC-EastUS-dev-01"
     },
     "vnetSubnetName": {
-      "value": ""
+      "value": "SNET-IaC-EastUS-PrivateLink"
     },
     "diagnosticLogWorkspaceId": {
       "value": ""

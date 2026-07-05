@@ -39,7 +39,7 @@ module storage_hns '../main.bicep' = {
     hierarchicalNamespaceEnabled: false
     nfsV3Enabled: false
     sftpEnabled: false
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: 'Disabled'
     containerDeleteRetentionPolicy: true
     diagnosticLogWorkspaceId: diagnosticLogWorkspaceId
     privateEndpointGroupNames: [

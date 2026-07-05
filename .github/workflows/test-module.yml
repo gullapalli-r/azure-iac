@@ -29,7 +29,7 @@ jobs:
   config:
     name: Set Deployment Stack name
     runs-on: ubuntu-latest
-    environment: RG
+    environment: rg-iac-eastus
     outputs:
       DEPLOYMENT_STACK_NAME: ${{ steps.step1.outputs.DEPLOYMENT_STACK_NAME }}
       REGION: ${{ steps.step1.outputs.REGION }}
@@ -57,7 +57,7 @@ jobs:
     needs:
       - config
     runs-on: ubuntu-latest
-    environment: RG
+    environment: rg-iac-eastus
     steps:
       - name: needs env
         env:

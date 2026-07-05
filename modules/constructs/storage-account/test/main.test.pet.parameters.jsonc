@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "stbrmtest01"
+    },
+    "vnetResourceGroupName": {
+      "value": "rg-iac-eastus"
+    },
+    "vnetName": {
+      "value": "SPOKE-IaC-EastUS-dev-01"
+    },
+    "vnetSubnetName": {
+      "value": "SNET-IaC-EastUS-PrivateLink"
+    },
+    "diagnosticLogWorkspaceId": {
+      "value": ""
+    },
+    "tags":{}
+  }
+}

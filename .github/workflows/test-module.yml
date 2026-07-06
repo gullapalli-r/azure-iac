@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - constructs/storage-account
+          - constructs/virtual-network
           - stamps/deployment-stamp
 
       operation:

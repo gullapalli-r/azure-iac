@@ -3,14 +3,14 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "resourceGroupName": {
-      "value": "rg-iac-eastus"
+      "value": "rg-iac-test-01-eastus"
     },
     "vNetName": {
       "value": "SPOKE-IaC-EastUS-Test-01"
-    },
-    "diagnosticLogWorkspaceId": {
-      "value": ""
-    },
-   "tags": { "value": {} }
+    }
+    //"diagnosticLogWorkspaceId": {
+    //  "value": ""
+    //},
+   // "tags": { "value": {} }
   }
 }

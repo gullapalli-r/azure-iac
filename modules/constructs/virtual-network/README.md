@@ -6,6 +6,13 @@ This module deploys a Virtual Network (vNet).
 
 {{Add detailed information about the module}}
 
+graph LR
+A[stamp/main.bicep\ntargetScope: subscription] -->|creates| B[Resource Group]
+B -->|scope| C[constructs/virtual-network\nmain.bicep\ntargetScope: resourceGroup]
+C -->|1 first| D[modules/network-security-group.bicep\n→ outputs resourceId]
+C -->|2 second| E[modules/route-table.bicep\n→ outputs resourceId]
+C -->|3 last, uses IDs from D+E| F[VNet + Subnets]
+
 ## Parameters
 
 | Name                                | Type            | Required | Description                                                                                                                                                                                                                                                                                                                      |
@@ -29,6 +36,8 @@ This module deploys a Virtual Network (vNet).
 | `enableVmProtection`                | `bool | null`   | No       | Optional. Indicates if VM protection is enabled for all the subnets in the virtual network.                                                                                                                                                                                                                                      |
 | `enablePrivateEndpointVNetPolicies` | `string`        | No       | Optional. Enables high scale private endpoints for the virtual network. This is necessary if the virtual network requires more than 1000 private endpoints or is peered to virtual networks with a total of more than 4000 private endpoints.                                                                                    |
 | `ipAllocations`                     | `null | array`  | No       | Optional. Array of IpAllocation which reference this VNET.                                                                                                                                                                                                                                                                       |
+| `networkSecurityGroups`             | `null | array`  | No       | Optional. Array of Network Security Groups to create and associate to subnets.                                                                                                                                                                                                                                                   |
+| `routeTables`                       | `null | array`  | No       | Optional. Array of Route Tables to create and associate to subnets.                                                                                                                                                                                                                                                              |
 
 ## Outputs
 
@@ -40,6 +49,8 @@ This module deploys a Virtual Network (vNet).
 | `subnetNames`       | `array`  | The names of the deployed subnets.                        |
 | `subnetResourceIds` | `array`  | The resource IDs of the deployed subnets.                 |
 | `location`          | `string` | The location the resource was deployed into.              |
+| `nsgItems`          | `array`  | The deployed Network Security Groups.                     |
+| `routeTableItems`   | `array`  | The deployed Route Tables.                                |
 
 ## Examples
 

@@ -18,8 +18,11 @@ on:
         type: choice
         options:
           - test_using_deployment_stack
+          - test_using_deployment_stack_sub
           - what_if
+          - what_if_sub
           - cleanup_deployment_stack
+          - cleanup_deployment_stack_sub
         default: what_if
 
 permissions:
@@ -95,6 +98,20 @@ jobs:
           --deny-settings-mode None \
           --output 'json'
 
+      - name: Deploy vnet using Deployment Stack
+        id: deployment_stack_sub
+        if: ${{ inputs.operation == 'test_using_deployment_stack_sub' }}
+        run: |
+          az stack sub create \
+          --name ${{ needs.config.outputs.DEPLOYMENT_STACK_NAME }} \
+          --location ${{ vars.REGION }} \
+          --template-file "modules/${{ inputs.module }}/test/main.test.bicep" \
+          --parameters "modules/${{ inputs.module }}/test/main.test.pet.parameters.jsonc" \
+          --description 'Run by: ${{ github.actor }}' \
+          --action-on-unmanage "deleteResources" \
+          --deny-settings-mode None \
+          --output 'json'
+
       - name: Deploy ARM Template (What-If)
         id: arm_what_if
         uses: Azure/arm-deploy@v2
@@ -110,11 +127,34 @@ jobs:
           additionalArguments: --what-if
           failOnStdErr: false
 
+      - name: Deploy ARM Template Sub (What-If)
+        id: arm_what_if_sub
+        uses: Azure/arm-deploy@v2
+        if: ${{ inputs.operation == 'what_if_sub' }}
+        with:
+          scope: subscription
+          deploymentName: "GHA-TEST-${{ github.run_number }}"
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          region: ${{ vars.REGION }}
+          template: modules/${{ inputs.module }}/test/main.test.bicep
+          parameters: modules/${{ inputs.module }}/test/main.test.pet.parameters.jsonc
+          additionalArguments: --what-if
+          failOnStdErr: false
+
       - name: Cleanup Deployment Stack
         if: ${{ inputs.operation == 'cleanup_deployment_stack' }}
         run: |
           az stack group delete \
           --name ${{ needs.config.outputs.DEPLOYMENT_STACK_NAME }} \
           --resource-group ${{ vars.RESOURCE_GROUP }} \
+          --action-on-unmanage "deleteAll" \
+          --yes
+
+      - name: Cleanup Deployment Stack Sub
+        if: ${{ inputs.operation == 'cleanup_deployment_stack_sub' }}
+        run: |
+          az stack sub delete \
+          --name ${{ needs.config.outputs.DEPLOYMENT_STACK_NAME }} \
+          --location ${{ vars.REGION }} \
           --action-on-unmanage "deleteAll" \
           --yes

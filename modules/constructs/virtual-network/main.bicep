@@ -104,6 +104,12 @@ var formattedRoleAssignments = [
   })
 ]
 
+@description('Optional. Array of Network Security Groups to create and associate to subnets.')
+param networkSecurityGroups NsgConfiguration[]?
+
+@description('Optional. Array of Route Tables to create and associate to subnets.')
+param routeTables RouteTableConfiguration[]?
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2025-05-01' = {
   name: name
   location: location
@@ -152,9 +158,35 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2025-05-01' = {
   }
 }
 
+module subnet_nsgs 'modules/network-security-group.bicep' = [
+  for (nsg, index) in (networkSecurityGroups ?? []): {
+    name: '${uniqueString(subscription().id, resourceGroup().id, location)}-nsg-${index}'
+    params: {
+      name: nsg.name
+      securityRules: nsg.?securityRules
+      tags: nsg.?tags ?? tags
+    }
+  }
+]
+
+module subnet_rts 'modules/route-table.bicep' = [
+  for (rt, index) in (routeTables ?? []): {
+    name: '${uniqueString(subscription().id, resourceGroup().id, location)}-rt-${index}'
+    params: {
+      name: rt.name
+      routes: rt.?routes
+      disableBgpRoutePropagation: rt.?disableBgpRoutePropagation ?? false
+      tags: rt.?tags ?? tags
+    }
+  }
+]
 @batchSize(1)
 module virtualNetwork_subnets 'modules/subnet.bicep' = [
   for (subnet, index) in (subnets ?? []): {
+    dependsOn: [
+      subnet_nsgs   // ← ensures NSGs exist before subnet association
+      subnet_rts    // ← ensures RTs exist before subnet association
+    ]
     name: '${uniqueString(subscription().id, resourceGroup().id, location)}-subnet-${index}'
     params: {
       virtualNetworkName: virtualNetwork.name
@@ -165,18 +197,22 @@ module virtualNetwork_subnets 'modules/subnet.bicep' = [
       applicationGatewayIPConfigurations: subnet.?applicationGatewayIPConfigurations
       delegation: subnet.?delegation
       natGatewayResourceId: subnet.?natGatewayResourceId
-      networkSecurityGroupResourceId: subnet.?networkSecurityGroupResourceId
+      // Resolve NSG: by name (construct-created) OR by resource ID (pre-existing)
+      networkSecurityGroupResourceId: subnet.?networkSecurityGroupName != null
+        ? resourceId('Microsoft.Network/networkSecurityGroups', subnet.networkSecurityGroupName!)
+        : subnet.?networkSecurityGroupResourceId
+      // Resolve RT: by name (construct-created) OR by resource ID (pre-existing)
+      routeTableResourceId: subnet.?routeTableName != null
+        ? resourceId('Microsoft.Network/routeTables', subnet.routeTableName!)
+        : subnet.?routeTableResourceId
       privateEndpointNetworkPolicies: subnet.?privateEndpointNetworkPolicies
       privateLinkServiceNetworkPolicies: subnet.?privateLinkServiceNetworkPolicies
-      //roleAssignments: subnet.?roleAssignments
-      routeTableResourceId: subnet.?routeTableResourceId
       serviceEndpointPolicies: subnet.?serviceEndpointPolicies
-      serviceEndpoints: subnet.?serviceEndpoints
+      serviceEndpoints: subnet.?serviceEndpoints ?? []
       defaultOutboundAccess: subnet.?defaultOutboundAccess
       sharingScope: subnet.?sharingScope
       ipAllocations: subnet.?ipAllocations
       serviceGateway: subnet.?serviceGateway
-      //enableTelemetry: enableReferencedModulesTelemetry
     }
   }
 ]
@@ -309,6 +345,22 @@ output subnetResourceIds array = [
 @description('The location the resource was deployed into.')
 output location string = virtualNetwork.location
 
+@description('The deployed Network Security Groups.')
+output nsgItems ResourceItem[] = [
+  for (nsg, index) in (networkSecurityGroups ?? []): {
+    name: subnet_nsgs[index].outputs.name
+    id: subnet_nsgs[index].outputs.resourceId
+  }
+]
+
+@description('The deployed Route Tables.')
+output routeTableItems ResourceItem[] = [
+  for (rt, index) in (routeTables ?? []): {
+    name: subnet_rts[index].outputs.name
+    id: subnet_rts[index].outputs.resourceId
+  }
+]
+
 // =============== //
 //   Definitions   //
 // =============== //
@@ -359,6 +411,66 @@ type peeringType = {
 
   @description('Optional. Whether only Ipv6 address space is peered for subnet peering.')
   enableOnlyIPv6Peering: bool?
+}
+
+type nsgSecurityRuleType = {
+  @description('Required. Name of the security rule.')
+  name: string
+  properties: {
+    access: 'Allow' | 'Deny'
+    description: string?
+    destinationAddressPrefix: string?
+    destinationAddressPrefixes: string[]?
+    destinationPortRange: string?
+    destinationPortRanges: string[]?
+    direction: 'Inbound' | 'Outbound'
+    priority: int
+    protocol: '*' | 'Ah' | 'Esp' | 'Icmp' | 'Tcp' | 'Udp'
+    sourceAddressPrefix: string?
+    sourceAddressPrefixes: string[]?
+    sourcePortRange: string?
+    sourcePortRanges: string[]?
+  }
+}
+
+type NsgConfiguration = {
+  @description('Required. Name of the Network Security Group.')
+  name: string
+  @description('Optional. Security rules to deploy.')
+  securityRules: nsgSecurityRuleType[]?
+  @description('Optional. Tags. Defaults to VNet tags if not specified.')
+  tags: object?
+}
+
+type routeEntryType = {
+  @description('Required. Name of the route.')
+  name: string
+  properties: {
+    @description('Required. The destination CIDR to which the route applies.')
+    addressPrefix: string
+    @description('Required. The type of Azure hop the packet should be sent to.')
+    nextHopType: 'Internet' | 'None' | 'VirtualAppliance' | 'VirtualNetworkGateway' | 'VnetLocal'
+    @description('Optional. The IP address packets should be forwarded to. Only allowed if nextHopType is VirtualAppliance.')
+    nextHopIpAddress: string?
+    @description('Optional. If true, the route overrides overlapping BGP routes.')
+    hasBgpOverride: bool?
+  }
+}
+
+type RouteTableConfiguration = {
+  @description('Required. Name of the Route Table.')
+  name: string
+  @description('Optional. Routes to deploy.')
+  routes: routeEntryType[]?
+  @description('Optional. Disable BGP route propagation. Default false.')
+  disableBgpRoutePropagation: bool?
+  @description('Optional. Tags. Defaults to VNet tags if not specified.')
+  tags: object?
+}
+
+type ResourceItem = {
+  name: string
+  id: string
 }
 
 @export()
@@ -421,6 +533,12 @@ type subnetType = {
   @description('Optional. Reference to an existing service gateway.')
   //serviceGateway: resourceInput<'Microsoft.Network/virtualNetworks/subnets@2025-05-01'>.properties.serviceGateway?
   serviceGateway: object?
+
+  @description('Optional. Name of an NSG from the `networkSecurityGroups` param. Construct creates and links it. Mutually exclusive with networkSecurityGroupResourceId.')
+  networkSecurityGroupName: string?
+
+  @description('Optional. Name of a Route Table from the `routeTables` param. Construct creates and links it. Mutually exclusive with routeTableResourceId.')
+  routeTableName: string?
 }
 
 @export()

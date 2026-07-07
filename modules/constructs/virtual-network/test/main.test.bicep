@@ -40,17 +40,44 @@ module testDeployment '../main.bicep' = [
         '10.0.1.4'
         '10.0.1.5'
       ]
+      networkSecurityGroups: [
+        {
+          name: 'SNET-IaC-EastUS-Test-PrivateLink-NSG'
+          securityRules: [] // add rules as needed
+        }
+        {
+          name: 'SNET-IaC-EastUS-Test-AppsVM-NSG'
+          securityRules: []
+        }
+      ]
+      routeTables: [
+        {
+          name: 'SNET-IaC-EastUS-Test-PrivateLink-Route'
+          routes: [] // add routes as needed
+        }
+        {
+          name: 'SNET-IaC-EastUS-Test-AppsVM-Route'
+          routes: []
+        }
+      ]
       subnets: [
         {
           addressPrefix: cidrSubnet(addressPrefix, 24, 0)
           name: 'SNET-IaC-EastUS-Test-PrivateLink'
-          networkSecurityGroupResourceId:'/subscriptions/4c324251-b16a-4681-b57e-19eea5661e88/resourceGroups/rg-iac-eastus/providers/Microsoft.Network/networkSecurityGroups/SNET-IaC-EastUS-PrivateLink-NSG'
+          networkSecurityGroupName: 'SNET-IaC-EastUS-Test-PrivateLink-NSG'
+          routeTableName: 'SNET-IaC-EastUS-Test-PrivateLink-Route'
+        }
+        {
+          addressPrefix: cidrSubnet(addressPrefix, 24, 1)
+          name: 'SNET-IaC-EastUS-Test-AppsVM'
+          networkSecurityGroupName: 'SNET-IaC-EastUS-Test-AppsVM-NSG'
+          routeTableName: 'SNET-IaC-EastUS-Test-AppsVM-Route'
         }
       ]
-      peerings:[
+      peerings: [
         {
-          name:'PN_SPOKE-IaC-EastUS-Test-01-Spoke'
-          remoteVirtualNetworkResourceId:'/subscriptions/4c324251-b16a-4681-b57e-19eea5661e88/resourceGroups/rg-hub-eastus/providers/Microsoft.Network/virtualNetworks/HUB-USEast'
+          name: 'PN_SPOKE-IaC-EastUS-Test-01-Spoke'
+          remoteVirtualNetworkResourceId: '/subscriptions/4c324251-b16a-4681-b57e-19eea5661e88/resourceGroups/rg-hub-eastus/providers/Microsoft.Network/virtualNetworks/HUB-USEast'
           allowVirtualNetworkAccess: true
           allowForwardedTraffic: false
           allowGatewayTransit: false

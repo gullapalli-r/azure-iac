@@ -1,4 +1,4 @@
-name: '2_RunAzCliCommands'
+name: "2_RunAzCliCommands"
 
 on:
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
       name: ${{ needs.config.outputs.resource_group }}
     needs: config
     outputs:
-      selected_runner: '${{ steps.get-variables.outputs.runner }}'
+      selected_runner: "${{ steps.get-variables.outputs.runner }}"
     env:
       region: ${{ needs.config.outputs.region }}
       resourceGroup: ${{ needs.config.outputs.resource_group }}

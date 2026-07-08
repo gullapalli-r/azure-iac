@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write   # required to push tags
+  contents: write # required to push tags
 
 jobs:
   get-changed-module:
@@ -20,23 +20,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # required to read version.json at base commit
+          fetch-depth: 0 # required to read version.json at base commit
 
       - name: Get base version
         id: base-version
         run: |
-          VERSION=$(git show ${{ github.event.before }}:${{ needs.get-changed-module.outputs.module_dir }}/version.json 2>/dev/null \
-            | jq -r '.version' 2>/dev/null || echo "0.0")
-          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+$ ]] && VERSION="${VERSION}.0"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          VERSION=$(git show "${{ github.event.before }}:${{ needs.get-changed-module.outputs.module_dir }}/version.json" 2>/dev/null \
+            | jq -r '.version // empty' 2>/dev/null || true)
 
+          VERSION=$(echo "$VERSION" | tr -d '[:space:]')
+          [ -z "$VERSION" ] && VERSION="0.0.0"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+$ ]] && VERSION="${VERSION}.0"
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
       - name: Get head version
         id: head-version
         run: |
-          VERSION=$(jq -r '.version' ${{ needs.get-changed-module.outputs.module_dir }}/version.json)
+          VERSION=$(jq -r '.version // empty' "${{ needs.get-changed-module.outputs.module_dir }}/version.json" 2>/dev/null || true)
+          VERSION=$(echo "$VERSION" | tr -d '[:space:]')
+          [ -z "$VERSION" ] && { echo "Head version missing"; exit 1; }
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+$ ]] && VERSION="${VERSION}.0"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
       - name: Install semver
         run: npm install semver
 

@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "resourceGroupName": {
-      "value": "rg-iac-test-01-eastus"
+      "value": "rg-vnet-test-01-eastus"
     },
     "vNetName": {
       "value": "SPOKE-IaC-EastUS-Test-01"

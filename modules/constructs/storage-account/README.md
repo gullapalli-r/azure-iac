@@ -6,6 +6,266 @@ Construct for using a storage account with private endpoints, diagnostics, and c
 
 {{Add detailed information about the module}}
 
+Storage Account Construct Parameters Guide
+
+Required parameters
+
+name: Storage account name, 3 to 24 chars, globally unique.
+subnetId: Subnet resource ID for private endpoint creation.
+Core optional parameters
+
+location: Defaults to resource group location.
+sku: Standard_ZRS default. Allowed values include Standard_LRS, Standard_GRS, Standard_RAGRS, Standard_GZRS, Standard_RAGZRS, Premium_LRS, Premium_ZRS.
+kind: StorageV2 default. Allowed values include BlobStorage, BlockBlobStorage, FileStorage, Storage, StorageV2.
+tags: Key/value object.
+diagnosticLogWorkspaceId: Log Analytics workspace resource ID.
+publicNetworkAccess: Enabled or Disabled.
+allowedCopyScope: AAD or PrivateLink (default PrivateLink).
+Data protection optional parameters
+
+deleteRetentionPolicyEnabled: Default true.
+deleteRetentionPolicyDays: 1 to 365, default 30.
+allowPermanentDelete: Default true.
+containerDeleteRetentionPolicy: Default false.
+containerDeleteRetentionPolicyDays: 1 to 365, default 30.
+allowContainerPermanentDelete: Default false.
+isVersioningEnabled: Default false, and disabled automatically when hierarchicalNamespaceEnabled is true.
+Protocol and namespace optional parameters
+
+hierarchicalNamespaceEnabled: Default false.
+nfsV3Enabled: Default false, requires hierarchicalNamespaceEnabled true.
+sftpEnabled: Default false.
+allowSharedKeyAccess: Default false.
+Network optional parameters
+
+networkAcls:
+defaultAction: Allow or Deny.
+bypass: Logging, Metrics, AzureServices, None, or combinations.
+virtualNetworkRules: Array of objects with id and optional action Allow.
+ipRules: Array of objects with value (CIDR) and optional action Allow.
+resourceAccessRules: Array of objects with tenantId and resourceId.
+privateEndpointGroupNames: Any of blob, file, table, queue, dfs. If omitted, default is blob, plus dfs when hierarchical namespace is enabled.
+Resource creation optional parameters
+
+containers: Array of objects with name.
+fileShares: Array of objects with:
+name
+accessTier: Premium, Hot, Cool, TransactionOptimized
+shareQuota
+enabledProtocols: SMB or NFS
+rootSquash: AllSquash, NoRootSquash, RootSquash
+Management policy rules optional parameter
+
+managementPolicyRules is an array of lifecycle rules.
+If omitted, the module applies default lifecycle rules automatically.
+Each rule object should include:
+name: Rule name
+enabled: true or false
+type: Lifecycle
+definition:
+filters:
+blobTypes: usually blockBlob
+actions:
+baseBlob: tierToCool, tierToCold, tierToArchive, delete
+snapshot: tierToCool, tierToCold, tierToArchive, delete
+version: tierToCool, tierToCold, tierToArchive, delete
+
+Minimal parameters.json example
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": { "value": "stbrmtest01" },
+    "subnetId": { "value": "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<subnet>" },
+    "tags": { "value": { "env": "dev" } }
+  }
+}
+
+Full
+
+{
+"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+"contentVersion": "1.0.0.0",
+"parameters": {
+"location": {
+"value": "eastus"
+},
+"name": {
+"value": "stbrmtest01"
+},
+"sku": {
+"value": "Standard_ZRS"
+},
+"kind": {
+"value": "StorageV2"
+},
+"hierarchicalNamespaceEnabled": {
+"value": false
+},
+"nfsV3Enabled": {
+"value": false
+},
+"sftpEnabled": {
+"value": false
+},
+"allowSharedKeyAccess": {
+"value": false
+},
+"subnetId": {
+"value": "/subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<subnet>"
+},
+"tags": {
+"value": {
+"env": "dev",
+"app": "poc"
+}
+},
+"diagnosticLogWorkspaceId": {
+"value": "/subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.OperationalInsights/workspaces/<law>"
+},
+"deleteRetentionPolicyDays": {
+"value": 30
+},
+"deleteRetentionPolicyEnabled": {
+"value": true
+},
+"allowPermanentDelete": {
+"value": true
+},
+"managementPolicyRules": {
+"value": [
+{
+"name": "lifecycle-rule-1",
+"enabled": true,
+"type": "Lifecycle",
+"definition": {
+"filters": {
+"blobTypes": [
+"blockBlob"
+]
+},
+"actions": {
+"baseBlob": {
+"tierToCool": {
+"daysAfterModificationGreaterThan": 30
+},
+"tierToCold": {
+"daysAfterModificationGreaterThan": 90
+},
+"tierToArchive": {
+"daysAfterModificationGreaterThan": 180
+}
+},
+"snapshot": {
+"tierToCool": {
+"daysAfterCreationGreaterThan": 30
+},
+"tierToArchive": {
+"daysAfterCreationGreaterThan": 180
+}
+},
+"version": {
+"tierToCool": {
+"daysAfterCreationGreaterThan": 30
+}
+}
+}
+}
+}
+]
+},
+"privateEndpointGroupNames": {
+"value": [
+"blob",
+"file"
+]
+},
+"allowedCopyScope": {
+"value": "PrivateLink"
+},
+"containers": {
+"value": [
+{
+"name": "raw"
+},
+{
+"name": "curated"
+}
+]
+},
+"containerDeleteRetentionPolicy": {
+"value": true
+},
+"containerDeleteRetentionPolicyDays": {
+"value": 30
+},
+"allowContainerPermanentDelete": {
+"value": false
+},
+"isVersioningEnabled": {
+"value": true
+},
+"accessTier": {
+"value": "Hot"
+},
+"networkAcls": {
+"value": {
+"defaultAction": "Deny",
+"bypass": "AzureServices",
+"virtualNetworkRules": [
+{
+"id": "/subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<subnet>",
+"action": "Allow"
+}
+],
+"ipRules": [
+{
+"value": "10.10.10.0/24",
+"action": "Allow"
+}
+],
+"resourceAccessRules": [
+{
+"tenantId": "<tenantGuid>",
+"resourceId": "/subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.Synapse/workspaces/<workspace>"
+}
+]
+}
+},
+"publicNetworkAccess": {
+"value": "Disabled"
+},
+"fileShares": {
+"value": [
+{
+"name": "appshare",
+"accessTier": "TransactionOptimized",
+"shareQuota": 100,
+"enabledProtocols": "SMB"
+},
+{
+"name": "nfsshare",
+"accessTier": "Premium",
+"shareQuota": 1024,
+"enabledProtocols": "NFS",
+"rootSquash": "RootSquash"
+}
+]
+}
+}
+}
+
+Important constraints while filling values:
+
+name and subnetId are required.
+nfsV3Enabled and sftpEnabled need hierarchicalNamespaceEnabled true.
+isVersioningEnabled should stay false when hierarchicalNamespaceEnabled is true.
+accessTier is mainly relevant when kind is BlobStorage.
+container and blob retention days must be 1 to 365.
+
+
+
 ## Parameters
 
 | Name                                 | Type            | Required | Description                                                                                                                                                                                                                                                                                                                                     |

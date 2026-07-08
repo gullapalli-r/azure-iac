@@ -16,8 +16,6 @@ on:
         required: true
       AZURE_SUBSCRIPTION_ID:
         required: true
-      PUBLISH_REGISTRY_SERVER:
-        required: true
   workflow_dispatch:
     inputs:
       tag:

@@ -155,6 +155,5 @@ jobs:
         run: |
           az stack sub delete \
           --name ${{ needs.config.outputs.DEPLOYMENT_STACK_NAME }} \
-          --location ${{ vars.REGION }} \
           --action-on-unmanage "deleteAll" \
           --yes

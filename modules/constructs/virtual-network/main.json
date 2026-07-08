@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.31.34.60546",
-      "templateHash": "11634059031306199078"
+      "version": "0.38.33.27573",
+      "templateHash": "18252192968654567508"
     },
     "name": "Virtual Networks",
     "description": "This module deploys a Virtual Network (vNet).",
@@ -1015,7 +1015,7 @@
         "count": "[length(coalesce(parameters('networkSecurityGroups'), createArray()))]"
       },
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[format('{0}-nsg-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1040,8 +1040,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.34.60546",
-              "templateHash": "4759412761602182505"
+              "version": "0.38.33.27573",
+              "templateHash": "11859068155233563545"
             },
             "name": "Network Security Groups",
             "description": "This module deploys a Network security Group (NSG)."
@@ -1515,7 +1515,7 @@
         "count": "[length(coalesce(parameters('routeTables'), createArray()))]"
       },
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[format('{0}-rt-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1543,8 +1543,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.34.60546",
-              "templateHash": "9579219142525353652"
+              "version": "0.38.33.27573",
+              "templateHash": "6035526802474830894"
             },
             "name": "Route Tables",
             "description": "This module deploys a User Defined Route Table (UDR)."
@@ -1699,7 +1699,7 @@
         "batchSize": 1
       },
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[format('{0}-subnet-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1765,8 +1765,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.34.60546",
-              "templateHash": "2227467116282151958"
+              "version": "0.38.33.27573",
+              "templateHash": "4148502504732588197"
             },
             "name": "Virtual Network Subnets",
             "description": "This module deploys a Virtual Network Subnet."
@@ -2026,7 +2026,7 @@
         "count": "[length(coalesce(parameters('peerings'), createArray()))]"
       },
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[format('{0}-virtualNetworkPeering-local-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -2068,8 +2068,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.34.60546",
-              "templateHash": "4968610902569355830"
+              "version": "0.38.33.27573",
+              "templateHash": "5918721496220189949"
             },
             "name": "Virtual Network Peerings",
             "description": "This module deploys a Virtual Network Peering."
@@ -2219,7 +2219,7 @@
       },
       "condition": "[coalesce(tryGet(coalesce(parameters('peerings'), createArray())[copyIndex()], 'remotePeeringEnabled'), false())]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[format('{0}-virtualNetworkPeering-remote-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
       "subscriptionId": "[split(coalesce(parameters('peerings'), createArray())[copyIndex()].remoteVirtualNetworkResourceId, '/')[2]]",
       "resourceGroup": "[split(coalesce(parameters('peerings'), createArray())[copyIndex()].remoteVirtualNetworkResourceId, '/')[4]]",
@@ -2263,8 +2263,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.34.60546",
-              "templateHash": "4968610902569355830"
+              "version": "0.38.33.27573",
+              "templateHash": "5918721496220189949"
             },
             "name": "Virtual Network Peerings",
             "description": "This module deploys a Virtual Network Peering."

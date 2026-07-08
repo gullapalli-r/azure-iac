@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.31.34.60546",
-      "templateHash": "11231592942306973039"
+      "version": "0.38.33.27573",
+      "templateHash": "1141451826481487373"
     },
     "name": "Storage Account Construct",
     "description": "Construct for using a storage account with private endpoints, diagnostics, and common settings.",
@@ -442,9 +442,6 @@
               },
               "tierToCold": {
                 "daysAfterModificationGreaterThan": 120
-              },
-              "tierToArchive": {
-                "daysAfterModificationGreaterThan": 180
               }
             },
             "snapshot": {
@@ -453,9 +450,6 @@
               },
               "tierToCold": {
                 "daysAfterCreationGreaterThan": 120
-              },
-              "tierToArchive": {
-                "daysAfterCreationGreaterThan": 180
               }
             },
             "version": {
@@ -464,9 +458,6 @@
               },
               "tierToCold": {
                 "daysAfterCreationGreaterThan": 120
-              },
-              "tierToArchive": {
-                "daysAfterCreationGreaterThan": 180
               }
             }
           },
@@ -674,7 +665,7 @@
     },
     "managementPolicies": {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[take(format('{0}-ST-MP', deployment().name), 64)]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -695,8 +686,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.34.60546",
-              "templateHash": "4624572068835783371"
+              "version": "0.38.33.27573",
+              "templateHash": "10435272663353388943"
             }
           },
           "parameters": {
@@ -754,7 +745,7 @@
         "count": "[length(coalesce(parameters('privateEndpointGroupNames'), variables('defaultStorageEndpointGroups')))]"
       },
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[take(format('{0}-ST-PE-{1}-{2}', deployment().name, coalesce(parameters('privateEndpointGroupNames'), variables('defaultStorageEndpointGroups'))[copyIndex()], copyIndex()), 64)]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -787,8 +778,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.34.60546",
-              "templateHash": "2378491791343824983"
+              "version": "0.38.33.27573",
+              "templateHash": "15171706976797911089"
             },
             "name": "Private Endpoint",
             "description": "Private Endpoint used for accessing private resources on POC internal networks",

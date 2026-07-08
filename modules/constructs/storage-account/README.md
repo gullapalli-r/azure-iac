@@ -73,13 +73,13 @@ version: tierToCool, tierToCold, tierToArchive, delete
 Minimal parameters.json example
 
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "name": { "value": "stbrmtest01" },
-    "subnetId": { "value": "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<subnet>" },
-    "tags": { "value": { "env": "dev" } }
-  }
+"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+"contentVersion": "1.0.0.0",
+"parameters": {
+"name": { "value": "stbrmtest01" },
+"subnetId": { "value": "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<subnet>" },
+"tags": { "value": { "env": "dev" } }
+}
 }
 
 Full
@@ -263,8 +263,6 @@ nfsV3Enabled and sftpEnabled need hierarchicalNamespaceEnabled true.
 isVersioningEnabled should stay false when hierarchicalNamespaceEnabled is true.
 accessTier is mainly relevant when kind is BlobStorage.
 container and blob retention days must be 1 to 365.
-
-
 
 ## Parameters
 

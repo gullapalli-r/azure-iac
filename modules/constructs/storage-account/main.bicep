@@ -246,9 +246,6 @@ var defaultManagementNonHnsPolicyRules = [
           tierToCold: {
             daysAfterModificationGreaterThan: 120
           }
-          tierToArchive: {
-            daysAfterModificationGreaterThan: 180
-          }
         }
         snapshot: {
           tierToCool: {
@@ -257,9 +254,6 @@ var defaultManagementNonHnsPolicyRules = [
           tierToCold: {
             daysAfterCreationGreaterThan: 120
           }
-          tierToArchive: {
-            daysAfterCreationGreaterThan: 180
-          }
         }
         version: {
           tierToCool: {
@@ -267,9 +261,6 @@ var defaultManagementNonHnsPolicyRules = [
           }
           tierToCold: {
             daysAfterCreationGreaterThan: 120
-          }
-          tierToArchive: {
-            daysAfterCreationGreaterThan: 180
           }
         }
       }

@@ -25,7 +25,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2025-04-01' = {
 // Test Execution //
 // ============== //
 
-var addressPrefix = '10.0.5.0/23'
+var addressPrefix = '10.0.5.0/24'
 @batchSize(1)
 module testDeployment '../main.bicep' = [
   for iteration in ['init', 'idem']: {

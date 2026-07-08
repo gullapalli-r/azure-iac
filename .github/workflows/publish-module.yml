@@ -7,6 +7,17 @@ on:
         description: "The git tag of the module to publish."
         required: true
         type: string
+
+    secrets:
+      # Secrets must be passed from the caller workflow explicitly.
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+      PUBLISH_REGISTRY_SERVER:
+        required: true
   workflow_dispatch:
     inputs:
       tag:

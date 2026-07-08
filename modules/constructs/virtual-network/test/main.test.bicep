@@ -42,36 +42,36 @@ module testDeployment '../main.bicep' = [
       ]
       networkSecurityGroups: [
         {
-          name: 'SNET-IaC-EastUS-Test-PrivateLink-NSG'
+          name: 'SNET-IaC-EastUS-Test-01-PrivateLink-NSG' //SPOKE-IaC-EastUS-Test-01
           securityRules: [] // add rules as needed
         }
         {
-          name: 'SNET-IaC-EastUS-Test-AppsVM-NSG'
+          name: 'SNET-IaC-EastUS-Test-01-AppsVM-NSG' //SPOKE-IaC-EastUS-Test-01
           securityRules: []
         }
       ]
       routeTables: [
         {
-          name: 'SNET-IaC-EastUS-Test-PrivateLink-Route'
+          name: 'SNET-IaC-EastUS-Test-01-PrivateLink-Route'
           routes: [] // add routes as needed
         }
         {
-          name: 'SNET-IaC-EastUS-Test-AppsVM-Route'
+          name: 'SNET-IaC-EastUS-Test-01-AppsVM-Route'
           routes: []
         }
       ]
       subnets: [
         {
           addressPrefix: cidrSubnet(addressPrefix, 27, 0)
-          name: 'SNET-IaC-EastUS-Test-PrivateLink'
-          networkSecurityGroupName: 'SNET-IaC-EastUS-Test-PrivateLink-NSG'
-          routeTableName: 'SNET-IaC-EastUS-Test-PrivateLink-Route'
+          name: 'SNET-IaC-EastUS-Test-01-PrivateLink'
+          networkSecurityGroupName: 'SNET-IaC-EastUS-Test-01-PrivateLink-NSG'
+          routeTableName: 'SNET-IaC-EastUS-Test-01-PrivateLink-Route'
         }
         {
           addressPrefix: cidrSubnet(addressPrefix, 27, 1)
-          name: 'SNET-IaC-EastUS-Test-AppsVM'
-          networkSecurityGroupName: 'SNET-IaC-EastUS-Test-AppsVM-NSG'
-          routeTableName: 'SNET-IaC-EastUS-Test-AppsVM-Route'
+          name: 'SNET-IaC-EastUS-Test-01-AppsVM'
+          networkSecurityGroupName: 'SNET-IaC-EastUS-Test-01-AppsVM-NSG'
+          routeTableName: 'SNET-IaC-EastUS-Test-01-AppsVM-Route'
         }
       ]
       peerings: [

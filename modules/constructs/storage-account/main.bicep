@@ -243,24 +243,15 @@ var defaultManagementNonHnsPolicyRules = [
           tierToCool: {
             daysAfterModificationGreaterThan: 90
           }
-          tierToCold: {
-            daysAfterModificationGreaterThan: 120
-          }
         }
         snapshot: {
           tierToCool: {
             daysAfterCreationGreaterThan: 90
           }
-          tierToCold: {
-            daysAfterCreationGreaterThan: 120
-          }
         }
         version: {
           tierToCool: {
             daysAfterCreationGreaterThan: 90
-          }
-          tierToCold: {
-            daysAfterCreationGreaterThan: 120
           }
         }
       }

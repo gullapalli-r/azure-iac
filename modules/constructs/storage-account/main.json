@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.38.33.27573",
-      "templateHash": "1141451826481487373"
+      "templateHash": "15782027456786189819"
     },
     "name": "Storage Account Construct",
     "description": "Construct for using a storage account with private endpoints, diagnostics, and common settings.",
@@ -439,25 +439,16 @@
             "baseBlob": {
               "tierToCool": {
                 "daysAfterModificationGreaterThan": 90
-              },
-              "tierToCold": {
-                "daysAfterModificationGreaterThan": 120
               }
             },
             "snapshot": {
               "tierToCool": {
                 "daysAfterCreationGreaterThan": 90
-              },
-              "tierToCold": {
-                "daysAfterCreationGreaterThan": 120
               }
             },
             "version": {
               "tierToCool": {
                 "daysAfterCreationGreaterThan": 90
-              },
-              "tierToCold": {
-                "daysAfterCreationGreaterThan": 120
               }
             }
           },

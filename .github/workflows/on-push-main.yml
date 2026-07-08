@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write # required to push tags
+  id-token: write
 
 jobs:
   get-changed-module:

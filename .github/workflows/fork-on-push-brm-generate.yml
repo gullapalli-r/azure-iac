@@ -8,7 +8,8 @@ on:
       - modules/**/*.bicep
       - modules/**/version.json
       - modules/**/README.md
-
+permissions:
+  contents: write
 jobs:
   get-module-to-validate:
     uses: ./.github/workflows/get-changed-module.yml
@@ -20,14 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.WORKFLOW_PAT }}
+          token: ${{ github.token }}
 
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
       - name: Install BRM tool
-        run: dotnet tool install --global Azure.Bicep.RegistryModuleTool --version ${{ vars.BRM_VERSION }}
+        run: dotnet tool install --global Azure.Bicep.RegistryModuleTool --version "${{ vars.BRM_VERSION || '0.28.0' }}"
 
       - name: Run brm generate
         run: brm generate

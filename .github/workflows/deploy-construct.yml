@@ -1,44 +1,44 @@
-name: 'Deploy Construct'
+name: "Deploy Construct"
 
 on:
   workflow_call:
     inputs:
       construct:
-        description: 'Construct name (e.g. storage-account, private-endpoint)'
+        description: "Construct name (e.g. storage-account, private-endpoint)"
         required: true
         type: string
       constructVersion:
-        description: 'Construct version tag (e.g. 0.2.0)'
+        description: "Construct version tag (e.g. 0.2.0)"
         required: true
         type: string
       parametersFile:
-        description: 'Path to parameters file relative to caller repo root'
+        description: "Path to parameters file relative to caller repo root"
         required: true
         type: string
       env:
-        description: 'GitHub environment name'
+        description: "GitHub environment name"
         required: true
         type: string
       azureRegion:
-        description: 'Azure region'
+        description: "Azure region"
         required: true
         type: string
       resourceGroup:
-        description: 'Resource group name'
+        description: "Resource group name"
         required: true
         type: string
       deploymentStackName:
-        description: 'Deployment Stack name (if empty, uses arm-deploy)'
+        description: "Deployment Stack name (if empty, uses arm-deploy)"
         required: false
         type: string
-        default: ''
+        default: ""
       actionOnUnmanage:
-        description: 'Action on unmanage for deployment stack'
+        description: "Action on unmanage for deployment stack"
         required: false
         type: string
-        default: 'detachAll'
+        default: "detachAll"
       whatIf:
-        description: 'Run as what-if instead of deploying'
+        description: "Run as what-if instead of deploying"
         required: false
         type: boolean
         default: false
@@ -56,7 +56,7 @@ permissions:
 
 jobs:
   deploy:
-    name: 'Deploy ${{ inputs.construct }} v${{ inputs.constructVersion }}'
+    name: "Deploy ${{ inputs.construct }} v${{ inputs.constructVersion }}"
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
 
@@ -89,13 +89,13 @@ jobs:
         uses: Azure/arm-deploy@v2
         with:
           scope: resourcegroup
-          deploymentName: 'GHA-${{ inputs.construct }}-${{ github.run_number }}-${{ env.NOW }}'
+          deploymentName: "GHA-${{ inputs.construct }}-${{ github.run_number }}-${{ env.NOW }}"
           subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
           resourceGroupName: ${{ inputs.resourceGroup }}
           region: ${{ inputs.azureRegion }}
           template: ConstructsRepo/modules/constructs/${{ inputs.construct }}/main.bicep
           parameters: CallerRepo/${{ inputs.parametersFile }}
-          additionalArguments: '--what-if'
+          additionalArguments: "--what-if"
           failOnStdErr: false
 
       - name: Deploy with Deployment Stack
@@ -115,7 +115,7 @@ jobs:
         uses: Azure/arm-deploy@v2
         with:
           scope: resourcegroup
-          deploymentName: 'GHA-${{ inputs.construct }}-${{ github.run_number }}-${{ env.NOW }}'
+          deploymentName: "GHA-${{ inputs.construct }}-${{ github.run_number }}-${{ env.NOW }}"
           subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
           resourceGroupName: ${{ inputs.resourceGroup }}
           region: ${{ inputs.azureRegion }}

@@ -25,7 +25,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2025-04-01' = {
 // Test Execution //
 // ============== //
 
-var addressPrefix = '10.0.0.0/16'
+var addressPrefix = '10.0.5.0/24'
 @batchSize(1)
 module testDeployment '../main.bicep' = [
   for iteration in ['init', 'idem']: {
@@ -62,13 +62,13 @@ module testDeployment '../main.bicep' = [
       ]
       subnets: [
         {
-          addressPrefix: cidrSubnet(addressPrefix, 24, 0)
+          addressPrefix: cidrSubnet(addressPrefix, 27, 0)
           name: 'SNET-IaC-EastUS-Test-PrivateLink'
           networkSecurityGroupName: 'SNET-IaC-EastUS-Test-PrivateLink-NSG'
           routeTableName: 'SNET-IaC-EastUS-Test-PrivateLink-Route'
         }
         {
-          addressPrefix: cidrSubnet(addressPrefix, 24, 1)
+          addressPrefix: cidrSubnet(addressPrefix, 27, 1)
           name: 'SNET-IaC-EastUS-Test-AppsVM'
           networkSecurityGroupName: 'SNET-IaC-EastUS-Test-AppsVM-NSG'
           routeTableName: 'SNET-IaC-EastUS-Test-AppsVM-Route'

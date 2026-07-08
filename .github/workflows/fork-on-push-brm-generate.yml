@@ -28,7 +28,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Install BRM tool
-        run: dotnet tool install --global Azure.Bicep.RegistryModuleTool --version "${{ vars.BRM_VERSION || '0.28.0' }}"
+        run: dotnet tool install --global Azure.Bicep.RegistryModuleTool --version "${{ vars.BRM_VERSION || '0.38.33' }}"
 
       - name: Run brm generate
         run: brm generate

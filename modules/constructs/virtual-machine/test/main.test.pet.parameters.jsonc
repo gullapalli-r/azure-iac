@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "windowsvmName": {
+      "value": "brmtest01vm"
+    },
+    "vnetResourceGroupName": {
+      "value": "rg-iac-eastus"
+    },
+    "vnetName": {
+      "value": "SPOKE-IaC-EastUS-dev-01"
+    },
+    "vnetSubnetName": {
+      "value": "SNET-IaC-EastUS-PrivateLink"
+    },
+    "tags": {}
+  }
+}

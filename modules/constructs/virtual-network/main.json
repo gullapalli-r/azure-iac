@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.38.33.27573",
-      "templateHash": "18252192968654567508"
+      "templateHash": "5701921514836937197"
     },
     "name": "Virtual Networks",
     "description": "This module deploys a Virtual Network (vNet).",
@@ -866,16 +866,6 @@
       "nullable": true,
       "metadata": {
         "description": "Optional. The lock settings of the service."
-      }
-    },
-    "roleAssignments": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/roleAssignmentType"
-      },
-      "nullable": true,
-      "metadata": {
-        "description": "Optional. Array of role assignments to create."
       }
     },
     "tags": {

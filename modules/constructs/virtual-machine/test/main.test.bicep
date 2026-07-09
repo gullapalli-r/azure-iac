@@ -49,7 +49,7 @@ module windowsVM '../main.bicep' = {
     }
     tags: tags
     vmSize: 'Standard_D2ads_v7'
-    securityType: 'Standard'
+    securityType: ''
     secureBootEnabled: false
     vTpmEnabled: false
     osDisk: {

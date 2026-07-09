@@ -49,15 +49,9 @@ param diagnosticSettings diagnosticSettingFullType[]?
 @description('Optional. The lock settings of the service.')
 param lock lockType?
 
-@description('Optional. Array of role assignments to create.')
-param roleAssignments roleAssignmentType[]?
-
 @description('Optional. Tags of the resource.')
 //param tags resourceInput<'Microsoft.Network/virtualNetworks@2025-05-01'>.tags?
 param tags object?
-
-//@description('Optional. Enable/Disable usage telemetry for module.')
-//param enableTelemetry bool = true
 
 @description('Optional. Indicates if VM protection is enabled for all the subnets in the virtual network.')
 param enableVmProtection bool?

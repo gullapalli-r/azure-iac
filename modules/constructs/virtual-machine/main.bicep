@@ -24,6 +24,7 @@ param computerName string = name
   'Standard_L16s_v4'
   'Standard_D2ds_v5'
   'Standard_D4ds_v5'
+  'Standard_D2ads_v7'
 ])
 param vmSize string = 'Standard_B2als_v2'
 

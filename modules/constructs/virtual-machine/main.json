@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.38.33.27573",
-      "templateHash": "15197804716013019102"
+      "templateHash": "5478684682168104798"
     },
     "owner": "Gullapalli-R",
     "name": "Virtual Machines",
@@ -769,7 +769,8 @@
         "Standard_L8s_v4",
         "Standard_L16s_v4",
         "Standard_D2ds_v5",
-        "Standard_D4ds_v5"
+        "Standard_D4ds_v5",
+        "Standard_D2ads_v7"
       ],
       "metadata": {
         "description": "Required. Specifies the size for the VMs."

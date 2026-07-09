@@ -48,8 +48,8 @@ module windowsVM '../main.bicep' = {
       version: 'latest'
     }
     tags: tags
-    vmSize: 'Standard_B2als_v2'
-    securityType: ''
+    vmSize: 'Standard_D2ads_v7'
+    securityType: 'Standard'
     secureBootEnabled: false
     vTpmEnabled: false
     osDisk: {

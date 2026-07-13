@@ -13,7 +13,6 @@
     },
     "vnetSubnetName": {
       "value": "SNET-IaC-EastUS-PrivateLink"
-    },
-    "tags":{}
+    }
   }
 }

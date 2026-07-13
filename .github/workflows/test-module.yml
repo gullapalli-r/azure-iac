@@ -11,6 +11,8 @@ on:
           - constructs/storage-account
           - constructs/virtual-network
           - constructs/virtual-machine
+          - constructs/container-registry
+          - constructs/log-analytics-workspace
           - stamps/deployment-stamp
 
       operation:

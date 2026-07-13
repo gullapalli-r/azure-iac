@@ -10,12 +10,14 @@ on:
       - modules/**/README.md
 permissions:
   contents: write
+  id-token: write
 jobs:
   get-module-to-validate:
     uses: ./.github/workflows/get-changed-module.yml
 
   push-brm-generate:
     runs-on: ubuntu-latest
+    environment: rg-iac-eastus
     needs: get-module-to-validate
     if: needs.get-module-to-validate.outputs.module_dir != ''
     steps:
@@ -30,6 +32,12 @@ jobs:
       - name: Install BRM tool
         run: dotnet tool install --global Azure.Bicep.RegistryModuleTool --version "${{ vars.BRM_VERSION || '0.38.33' }}"
 
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: Run brm generate
         run: brm generate
         working-directory: ${{ needs.get-module-to-validate.outputs.module_dir }}

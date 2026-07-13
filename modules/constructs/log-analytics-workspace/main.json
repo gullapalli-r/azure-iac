@@ -1,0 +1,168 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.38.33.27573",
+      "templateHash": "11965093868099373183"
+    },
+    "name": "Log Analytics Workspace",
+    "description": "Construct for Log Analytics Workspace",
+    "owner": "Gullapalli-R"
+  },
+  "definitions": {
+    "workspaceFeaturesType": {
+      "type": "object",
+      "properties": {
+        "disableLocalAuth": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Disable Non-EntraID based Auth. Default is true."
+          }
+        },
+        "enableDataExport": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Flag that indicate if data should be exported."
+          }
+        },
+        "enableLogAccessUsingOnlyResourcePermissions": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Enable log access using only resource permissions. Default is false."
+          }
+        },
+        "immediatePurgeDataOn30Days": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Flag that describes if we want to remove the data after 30 days."
+          }
+        }
+      },
+      "metadata": {
+        "description": "Features of the workspace."
+      }
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The geo-location where the resource lives."
+      }
+    },
+    "name": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 63,
+      "metadata": {
+        "description": "The resource name."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "PerGB2018",
+      "allowedValues": [
+        "CapacityReservation",
+        "Free",
+        "LACluster",
+        "PerGB2018",
+        "PerNode",
+        "Premium",
+        "Standalone",
+        "Standard"
+      ],
+      "metadata": {
+        "description": "The name of the SKU."
+      }
+    },
+    "features": {
+      "$ref": "#/definitions/workspaceFeaturesType",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The workspace features."
+      }
+    },
+    "publicNetworkAccessForIngestionEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "The network access type for accessing Log Analytics ingestion."
+      }
+    },
+    "publicNetworkAccessForQueryEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "The network access type for accessing Log Analytics query."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+      }
+    },
+    "dailyQuotaGb": {
+      "type": "int",
+      "defaultValue": 24,
+      "minValue": -1,
+      "metadata": {
+        "description": "The workspace daily quota for ingestion. Default value is 24."
+      }
+    }
+  },
+  "resources": {
+    "logWorkspace": {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2025-02-01",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "features": {
+          "searchVersion": 1,
+          "enableLogAccessUsingOnlyResourcePermissions": "[coalesce(tryGet(parameters('features'), 'enableLogAccessUsingOnlyResourcePermissions'), false())]",
+          "disableLocalAuth": "[coalesce(tryGet(parameters('features'), 'disableLocalAuth'), true())]",
+          "enableDataExport": "[coalesce(tryGet(parameters('features'), 'enableDataExport'), false())]",
+          "immediatePurgeDataOn30Days": "[coalesce(tryGet(parameters('features'), 'immediatePurgeDataOn30Days'), false())]"
+        },
+        "sku": {
+          "name": "[parameters('sku')]"
+        },
+        "workspaceCapping": {
+          "dailyQuotaGb": "[parameters('dailyQuotaGb')]"
+        },
+        "publicNetworkAccessForIngestion": "[if(parameters('publicNetworkAccessForIngestionEnabled'), 'Enabled', 'Disabled')]",
+        "publicNetworkAccessForQuery": "[if(parameters('publicNetworkAccessForQueryEnabled'), 'Enabled', 'Disabled')]"
+      }
+    }
+  },
+  "outputs": {
+    "id": {
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the resource."
+      },
+      "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('name'))]"
+    },
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the resource."
+      },
+      "value": "[parameters('name')]"
+    }
+  }
+}

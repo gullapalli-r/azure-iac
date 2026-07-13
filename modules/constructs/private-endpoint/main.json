@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.31.34.60546",
-      "templateHash": "2378491791343824983"
+      "version": "0.38.33.27573",
+      "templateHash": "7221841512582795938"
     },
     "name": "Private Endpoint",
     "description": "Private Endpoint used for accessing private resources on POC internal networks",
@@ -129,7 +129,6 @@
         "grafana",
         "prometheusMetrics",
         "Bot",
-        "Token",
         "AzureBackup",
         "AzureSiteRecovery",
         "managedEnvironments"

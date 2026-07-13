@@ -4,6 +4,10 @@ All notable changes should be published in this changelog. While GitHub issues c
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.1.1] - 2026-07-05[YYYY-MM-DD]
+## [0.6.0] - 2026-07-13[YYYY-MM-DD]
+
+Private endpoint reference change to ACR.
+
+## [0.5.0] - 2026-07-05[YYYY-MM-DD]
 
 Initial Version.

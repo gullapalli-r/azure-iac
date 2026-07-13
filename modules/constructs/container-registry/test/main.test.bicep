@@ -32,9 +32,9 @@ module registry '../main.bicep' = {
     anonymousPullEnabled: true
     adminUserEnabled: false
     exportPolicyStatusEnabled: false
-    lock: {
-      kind: 'CanNotDelete'
-      name: 'ACR-Lock'
-    }
+    //lock: {
+    //  kind: 'CanNotDelete'
+    //  name: 'ACR-Lock'
+    //}
   }
 }

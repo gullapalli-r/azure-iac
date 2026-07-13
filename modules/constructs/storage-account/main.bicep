@@ -340,7 +340,7 @@ resource diagnosticsStorage 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
     ]
   }
 }
-module privateEndpoint '../private-endpoint/main.bicep' = [
+module privateEndpoint 'br:bicepiacregistry.azurecr.io/bicep/constructs/private-endpoint:0.3.0' = [
   for (item, index) in privateEndpointGroupNames ?? defaultStorageEndpointGroups: {
     name: take('${deployment().name}-ST-PE-${item}-${index}', 64)
     params: {

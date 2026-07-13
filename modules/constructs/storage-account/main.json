@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.38.33.27573",
-      "templateHash": "15782027456786189819"
+      "templateHash": "16098929360121858703"
     },
     "name": "Storage Account Construct",
     "description": "Construct for using a storage account with private endpoints, diagnostics, and common settings.",
@@ -770,7 +770,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.38.33.27573",
-              "templateHash": "15171706976797911089"
+              "templateHash": "7221841512582795938"
             },
             "name": "Private Endpoint",
             "description": "Private Endpoint used for accessing private resources on POC internal networks",
@@ -894,7 +894,6 @@
                 "grafana",
                 "prometheusMetrics",
                 "Bot",
-                "Token",
                 "AzureBackup",
                 "AzureSiteRecovery",
                 "managedEnvironments"

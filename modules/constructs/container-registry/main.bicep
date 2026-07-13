@@ -154,7 +154,7 @@ resource registry_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(l
 
 var groupId = 'registry'
 
-module privateEndpoint 'br:contregietbmrpet01.azurecr.io/bicep/constructs/private-endpoint:0.3.2' = if (!empty(subnetId)) {
+module privateEndpoint 'br:bicepiacregistry.azurecr.io/bicep/constructs/private-endpoint:0.1.1' = if (!empty(subnetId)) {
   name: '${deployment().name}-PE'
   params: {
     endpointGroupId: groupId

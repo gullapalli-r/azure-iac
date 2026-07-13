@@ -7,8 +7,8 @@ param name string = 'peer-${localVnetName}-${last(split(remoteVirtualNetworkReso
 @description('Conditional. The name of the parent Virtual Network to add the peering to. Required if the template is used in a standalone deployment.')
 param localVnetName string
 
-@description('Optional. Enable/Disable usage telemetry for module.')
-param enableTelemetry bool = true
+//@description('Optional. Enable/Disable usage telemetry for module.')
+//param enableTelemetry bool = true
 
 @description('Required. The Resource ID of the VNet that is this Local VNet is being peered to. Should be in the format of a Resource ID.')
 param remoteVirtualNetworkResourceId string
@@ -31,24 +31,24 @@ param useRemoteGateways bool = false
 @description('Optional. Whether only Ipv6 address space is peered for subnet peering.')
 param enableOnlyIPv6Peering bool = false
 
-#disable-next-line no-deployments-resources
-resource avmTelemetry 'Microsoft.Resources/deployments@2025-04-01' = if (enableTelemetry) {
-  name: '46d3xbcp.res.network-virtualnetwork-peering.${replace('-..--..-', '.', '-')}.${substring(uniqueString(deployment().name), 0, 4)}'
-  properties: {
-    mode: 'Incremental'
-    template: {
-      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
-      contentVersion: '1.0.0.0'
-      resources: []
-      outputs: {
-        telemetry: {
-          type: 'String'
-          value: 'For more information, see https://aka.ms/avm/TelemetryInfo'
-        }
-      }
-    }
-  }
-}
+//#disable-next-line no-deployments-resources
+//resource avmTelemetry 'Microsoft.Resources/deployments@2025-04-01' = if (enableTelemetry) {
+//  name: '46d3xbcp.res.network-virtualnetwork-peering.${replace('-..--..-', '.', '-')}.${substring(uniqueString(deployment().name), 0, 4)}'
+//  properties: {
+//    mode: 'Incremental'
+//    template: {
+//      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+//      contentVersion: '1.0.0.0'
+//      resources: []
+//      outputs: {
+//        telemetry: {
+//          type: 'String'
+//          value: 'For more information, see https://aka.ms/avm/TelemetryInfo'
+//        }
+//      }
+//    }
+//  }
+//}
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2025-05-01' existing = {
   name: localVnetName

@@ -104,7 +104,6 @@ param tags object = {}
   'grafana'
   'prometheusMetrics'
   'Bot'
-  'Token'
   'AzureBackup'
   'AzureSiteRecovery'
   'managedEnvironments'

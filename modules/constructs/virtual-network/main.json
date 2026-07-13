@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.38.33.27573",
-      "templateHash": "5701921514836937197"
+      "templateHash": "418441883093734364"
     },
     "name": "Virtual Networks",
     "description": "This module deploys a Virtual Network (vNet).",
@@ -1006,7 +1006,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
-      "name": "[format('{0}-nsg-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
+      "name": "[take(format('{0}-nsg-{1}', deployment().name, copyIndex()), 64)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1506,7 +1506,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
-      "name": "[format('{0}-rt-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
+      "name": "[take(format('{0}-rt-{1}', deployment().name, copyIndex()), 64)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1690,7 +1690,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
-      "name": "[format('{0}-subnet-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
+      "name": "[take(format('{0}-subnet-{1}', deployment().name, copyIndex()), 64)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -2017,7 +2017,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
-      "name": "[format('{0}-virtualNetworkPeering-local-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
+      "name": "[take(format('{0}-peering-local-{1}', deployment().name, copyIndex()), 64)]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -2210,7 +2210,7 @@
       "condition": "[coalesce(tryGet(coalesce(parameters('peerings'), createArray())[copyIndex()], 'remotePeeringEnabled'), false())]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
-      "name": "[format('{0}-virtualNetworkPeering-remote-{1}', uniqueString(subscription().id, resourceGroup().id, parameters('location')), copyIndex())]",
+      "name": "[take(format('{0}-peering-remote-{1}', deployment().name, copyIndex()), 64)]",
       "subscriptionId": "[split(coalesce(parameters('peerings'), createArray())[copyIndex()].remoteVirtualNetworkResourceId, '/')[2]]",
       "resourceGroup": "[split(coalesce(parameters('peerings'), createArray())[copyIndex()].remoteVirtualNetworkResourceId, '/')[4]]",
       "properties": {

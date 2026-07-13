@@ -58,8 +58,8 @@ param anonymousPullEnabled bool = true
 @description('The ID of the subnet from which the private IP will be allocated.')
 param subnetId string
 
-//@description('Lock configuration for the service.')
-//@param lock LockType?
+@description('Lock configuration for the service.')
+param lock LockType?
 
 resource registry 'Microsoft.ContainerRegistry/registries@2023-06-01-preview' = {
   name: name
@@ -143,14 +143,16 @@ resource registry 'Microsoft.ContainerRegistry/registries@2023-06-01-preview' = 
   }
 }
 
-//resource registry_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock ?? {}) && lock.?kind != 'None') {
-//  name: lock.?name ?? 'lock-${name}'
-//  properties: {
-//    level: lock.?kind ?? ''
-//    notes: lock.?kind == 'CanNotDelete' ? 'Cannot delete resource or child resources.' : 'Cannot delete or modify the resource or child resources.'
-//  }
-//  scope: registry
-//}
+resource registry_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock ?? {}) && lock.?kind != 'None') {
+  name: lock.?name ?? 'lock-${name}'
+  properties: {
+    level: lock.?kind ?? ''
+    notes: lock.?kind == 'CanNotDelete'
+      ? 'Cannot delete resource or child resources.'
+      : 'Cannot delete or modify the resource or child resources.'
+  }
+  scope: registry
+}
 
 var groupId = 'registry'
 
@@ -172,10 +174,10 @@ output id string = registry.id
 @description('Name of the resource.')
 output name string = registry.name
 
-//type LockType = {
-//  @description('Optional. Specify the name of lock.')
-//  name: string?
-//
-//  @description('Optional. Specify the type of lock.')
-//  kind: ('CanNotDelete' | 'ReadOnly' | 'None')?
-//}
+type LockType = {
+  @description('Optional. Specify the name of lock.')
+  name: string?
+
+  @description('Optional. Specify the type of lock.')
+  kind: ('CanNotDelete' | 'ReadOnly' | 'None')?
+}

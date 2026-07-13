@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.38.33.27573",
-      "templateHash": "15432187271006054473"
+      "templateHash": "4407148976883567004"
     },
     "name": "Azure Container Registries (ACR)",
     "description": "Construct for using an Azure Container Registries with private endpoint",
@@ -310,12 +310,12 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.23.1.45101",
-              "templateHash": "6916458071693187831"
+              "version": "0.38.33.27573",
+              "templateHash": "7221841512582795938"
             },
             "name": "Private Endpoint",
-            "description": "Private Endpoint used for accessing private resources on internal networks",
-            "owner": "bh-garo-yeriazarian"
+            "description": "Private Endpoint used for accessing private resources on POC internal networks",
+            "owner": "Gullapalli-R"
           },
           "parameters": {
             "name": {
@@ -383,7 +383,9 @@
                 "File Sync Service",
                 "file_secondary",
                 "Gremlin",
+                "Gateway",
                 "hosting environment",
+                "hybridcompute",
                 "HSM",
                 "IoTApps",
                 "iotDps",
@@ -410,6 +412,12 @@
                 "searchService",
                 "signalr",
                 "sites",
+                "sites-slot-dev",
+                "sites-slot-qa",
+                "sites-slot-testing",
+                "sites-slot-staging",
+                "sites-slot-preprod",
+                "sites-slot-prod",
                 "SQL",
                 "SqlOnDemand",
                 "sqlServer",
@@ -423,7 +431,13 @@
                 "web",
                 "web_secondary",
                 "Webhook",
-                "webpubsub"
+                "webpubsub",
+                "grafana",
+                "prometheusMetrics",
+                "Bot",
+                "AzureBackup",
+                "AzureSiteRecovery",
+                "managedEnvironments"
               ],
               "metadata": {
                 "description": "The ID of the group obtained from the remote resource that this private endpoint should connect to (https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview)."
@@ -460,7 +474,7 @@
           "resources": [
             {
               "type": "Microsoft.Network/privateEndpoints",
-              "apiVersion": "2023-05-01",
+              "apiVersion": "2023-11-01",
               "name": "[parameters('name')]",
               "location": "[parameters('location')]",
               "tags": "[parameters('tags')]",

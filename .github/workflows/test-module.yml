@@ -13,7 +13,7 @@ on:
           - constructs/virtual-machine
           - constructs/container-registry
           - constructs/log-analytics-workspace
-          - stamps/deployment-stamp
+          - stamps/platform-services
 
       operation:
         description: The operation to perform.

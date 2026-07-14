@@ -7,11 +7,11 @@ targetScope = 'resourceGroup'
 @description('Geo-location of the resources.')
 param location string = resourceGroup().location
 
-@description('Name for the environment, this is the container for the application and data stamps and can be like: `np01`, `stg02`, `demo01`. It may not have an index at first, but could later. Keep this short as it is used for generating names. Use DNS segment naming rules.')
+@description('Environment identifier representing the deployment stage (e.g., dev, stg, prd). Used to categorize and organize resources across different deployment environments. This value is incorporated into resource names for easy identification and tracking.')
 param environmentName string
 
-@description('Name for the application stamp, default `app`. This will be used to generate automatic names for resources. If deploying multiple application stamps into an environment, make sure to change this to avoid overwriting resources. Use DNS segment naming rules.')
-param name string = 'platform01'
+@description('Workload or service identifier for this platform-services stamp (e.g., infra, core, platform). Used to distinguish multiple platform-services stamps within the same environment. This value is incorporated into resource names to enable multiple deployments without conflicts.')
+param name string = 'platform'
 
 // Network Settings
 @description('Name of the resource group of the virtual network.')
@@ -74,7 +74,7 @@ module storage 'br:bicepiacregistry.azurecr.io/bicep/constructs/storage-account:
   for (item, index) in (enableStorage ? storage_items : []): {
     name: '${deployment().name}-ST-${index}'
     params: {
-      name: item.name
+      name: toLower('st${replace(environmentName, '-', '')}${replace(name, '-', '')}${item.shortName}')
       location: location
       tags: (item.?tags ?? tags)
       subnetId: subnet_privateLink
@@ -91,7 +91,7 @@ module storage 'br:bicepiacregistry.azurecr.io/bicep/constructs/storage-account:
       deleteRetentionPolicyDays: item.?deleteRetentionPolicyDays ?? 30
       managementPolicyRules: item.?managementPolicyRules
       deleteRetentionPolicyEnabled: item.?deleteRetentionPolicyEnabled ?? true
-      diagnosticLogWorkspaceId: item.?diagnosticLogWorkspaceId
+      diagnosticLogWorkspaceId: enableLogWorkspace ? log.outputs.id : ''
       fileShares: item.?fileShares
       allowContainerPermanentDelete: item.?allowContainerPermanentDelete ?? false
       containerDeleteRetentionPolicy: item.?containerDeleteRetentionPolicy ?? false
@@ -205,10 +205,10 @@ type networkAclsType = {
 }
 
 type StorageConfiguration = {
-  @description('Name of Storage Account. Must be unique within Azure.')
+  @description('Short name of Storage Account. Must be unique within Azure.')
   @minLength(3)
-  @maxLength(24)
-  name: string
+  @maxLength(10)
+  shortName: string
   @description('Whether or not to allow shared key access.')
   allowSharedKeyAccess: bool?
   @description('Enable Hierarchical Namespace (Azure Data Lake Storage v2). This cannot be changed once set to true.')
@@ -272,7 +272,7 @@ type StorageConfiguration = {
 //Container Registry
 type ContainerRegistryConfiguration = {
   @description('Short name used to generate the full ACR name. Provide only the suffix (e.g. "01" or "acr01"). Full ACR name = toLower("contreg" + replace(environmentName, "-", "") + replace(name, "-", "") + shortName). Example: environmentName="BMRTEST", name="data01", shortName="acr01" -> contregbmrtestdata01acr01')
-  @minLength(5)
+  @minLength(1)
   @maxLength(50)
   shortName: string
   @description('The SKU of the container registry.')

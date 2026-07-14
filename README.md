@@ -22,6 +22,7 @@ This repository contains a curated collection of reusable **Bicep modules** and 
 ## 🎯 Overview
 
 **Azure IAC** is a comprehensive Bicep module registry designed to:
+
 - Provide reusable, production-ready infrastructure components
 - Enforce security best practices and compliance standards
 - Enable fast, consistent infrastructure deployments across Azure
@@ -29,6 +30,7 @@ This repository contains a curated collection of reusable **Bicep modules** and 
 - Automate testing, validation, and publishing
 
 **Key Features:**
+
 - ✅ Private endpoint support for all services
 - ✅ Built-in diagnostic logging
 - ✅ Comprehensive tagging strategy
@@ -72,16 +74,17 @@ azure-iac/
 
 **Constructs** are individual infrastructure building blocks. Each provides a single, focused Azure resource with opinionated defaults and best practices.
 
-| Module | Description | Version |
-|--------|-------------|---------|
-| **container-registry** | Azure Container Registry with security features (quarantine, retention, soft delete) | 0.1.0 |
-| **log-analytics-workspace** | Log Analytics Workspace for centralized monitoring & logging | 0.1.0 |
-| **private-endpoint** | Private endpoint for secure service connectivity | 0.3.0 |
-| **storage-account** | Storage Account with lifecycle management, soft delete, and private endpoints | 0.6.0 |
-| **virtual-machine** | Virtual Machine with extensions and protected items | 1.0+ |
-| **virtual-network** | Virtual Network with subnets, NSGs, and route tables | 1.0+ |
+| Module                      | Description                                                                          | Version |
+| --------------------------- | ------------------------------------------------------------------------------------ | ------- |
+| **container-registry**      | Azure Container Registry with security features (quarantine, retention, soft delete) | 0.1.0   |
+| **log-analytics-workspace** | Log Analytics Workspace for centralized monitoring & logging                         | 0.1.0   |
+| **private-endpoint**        | Private endpoint for secure service connectivity                                     | 0.3.0   |
+| **storage-account**         | Storage Account with lifecycle management, soft delete, and private endpoints        | 0.6.0   |
+| **virtual-machine**         | Virtual Machine with extensions and protected items                                  | 1.0+    |
+| **virtual-network**         | Virtual Network with subnets, NSGs, and route tables                                 | 1.0+    |
 
 **Usage Example:**
+
 ```bicep
 module storage 'br:bicepiacregistry.azurecr.io/bicep/constructs/storage-account:0.6.0' = {
   name: 'storageDeployment'
@@ -105,11 +108,13 @@ module storage 'br:bicepiacregistry.azurecr.io/bicep/constructs/storage-account:
 The **Platform-Services** stamp deploys foundational infrastructure services for application workloads.
 
 **Included Services:**
+
 - 🔍 **Log Analytics Workspace** — Centralized logging & monitoring
 - 💾 **Storage Account(s)** — Multi-purpose data storage (blob, file, ADLS Gen2)
 - 📦 **Container Registry** — Private container image repository
 
 **Key Features:**
+
 - Private endpoints for all services
 - Configurable daily ingestion quota for LAW
 - Support for multiple storage accounts (blob, data lake, logs)
@@ -118,11 +123,13 @@ The **Platform-Services** stamp deploys foundational infrastructure services for
 - Full network isolation via private link subnet
 
 **Resource Naming Convention:**
+
 - Log Analytics: `LOG-{ENVIRONMENT}-{NAME}` (e.g., `LOG-DEV01-PLATFORM`)
 - Storage Account: `st{env}{name}{shortName}` (e.g., `stdev01platformdata`)
 - Container Registry: `contreg{env}{name}{shortName}` (e.g., `contregdev01platformacr01`)
 
 **Usage Example:**
+
 ```bicep
 module platformServices 'br:bicepiacregistry.azurecr.io/bicep/stamps/platform-services:0.1.0' = {
   name: 'platformServicesDeployment'
@@ -133,12 +140,12 @@ module platformServices 'br:bicepiacregistry.azurecr.io/bicep/stamps/platform-se
     vnet_resourceGroup: 'rg-network'
     vnet_name: 'vnet-hub'
     vnet_privateLinkSubnet: 'snet-private-link'
-    
+
     storage_items: [
       { shortName: 'data', hierarchicalNamespaceEnabled: true }
       { shortName: 'logs', accessTier: 'Cool' }
     ]
-    
+
     containerRegistry_items: [
       { shortName: '01', skuName: 'Premium' }
     ]
@@ -157,10 +164,12 @@ module platformServices 'br:bicepiacregistry.azurecr.io/bicep/stamps/platform-se
 - **GitHub Credentials** — For CI/CD workflows (OIDC federation configured)
 
 **Azure RBAC Requirements:**
+
 - `Owner` or `Contributor` role on subscription/resource group
 - Service Principal with federated credentials for GitHub Actions
 
 **Network Prerequisites:**
+
 - Existing VNet with private link subnet
 - Network security configured for private endpoints
 
@@ -205,6 +214,7 @@ bicep build modules/constructs/storage-account/main.bicep
 ### Using Constructs
 
 **Deploy Storage Account:**
+
 ```bicep
 module storage 'br:bicepiacregistry.azurecr.io/bicep/constructs/storage-account:0.6.0' = {
   name: 'storageModule'
@@ -225,6 +235,7 @@ module storage 'br:bicepiacregistry.azurecr.io/bicep/constructs/storage-account:
 ```
 
 **Deploy Container Registry:**
+
 ```bicep
 module acr 'br:bicepiacregistry.azurecr.io/bicep/constructs/container-registry:0.1.0' = {
   name: 'acrModule'
@@ -266,6 +277,7 @@ The repository includes automated testing via GitHub Actions:
 4. View results in the workflow run
 
 **Available Operations:**
+
 - `what_if` — Dry-run validation (no changes)
 - `test_using_deployment_stack` — Deploy with cleanup
 - `cleanup_deployment_stack` — Remove test resources
@@ -292,13 +304,13 @@ az deployment group create \
 
 ### Available Workflows
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| **on-push-main.yml** | Push to main | Build, test, publish modules |
-| **on-pull-request.yml** | PR to main | Validate changes, run tests |
-| **fork-on-push-brm-generate.yml** | Push to branch | Auto-generate Bicep files |
-| **test-module.yml** | Manual trigger | Deploy & test specific module |
-| **publish-module.yml** | Manual trigger | Publish module to registry |
+| Workflow                          | Trigger        | Purpose                       |
+| --------------------------------- | -------------- | ----------------------------- |
+| **on-push-main.yml**              | Push to main   | Build, test, publish modules  |
+| **on-pull-request.yml**           | PR to main     | Validate changes, run tests   |
+| **fork-on-push-brm-generate.yml** | Push to branch | Auto-generate Bicep files     |
+| **test-module.yml**               | Manual trigger | Deploy & test specific module |
+| **publish-module.yml**            | Manual trigger | Publish module to registry    |
 
 ### GitHub Secrets Required
 
@@ -327,11 +339,13 @@ AZURE_TENANT_ID
 ### Create a New Module
 
 1. **Create module directory:**
+
    ```bash
    mkdir -p modules/constructs/my-module/test
    ```
 
 2. **Add required files:**
+
    - `main.bicep` — Module definition
    - `README.md` — Documentation
    - `CHANGELOG.md` — Version history
@@ -340,6 +354,7 @@ AZURE_TENANT_ID
    - `test/main.test.pet.parameters.jsonc` — Test parameters
 
 3. **Validate:**
+
    ```bash
    bicep build modules/constructs/my-module/main.bicep
    ```

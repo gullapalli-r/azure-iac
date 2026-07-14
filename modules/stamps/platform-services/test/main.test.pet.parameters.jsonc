@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "platform"
+    },
+    "environmentName": {
+      "value": "dev01"
+    },
+    "vnet_resourceGroup": {
+      "value": "rg-iac-eastus"
+    },
+    "vnet_name": {
+      "value": "SPOKE-IaC-EastUS-dev-01"
+    },
+    "vnet_privateLinkSubnet": {
+      "value": "SNET-IaC-EastUS-PrivateLink"
+    }
+  }
+}

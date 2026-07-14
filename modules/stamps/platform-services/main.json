@@ -1,0 +1,2525 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.38.33.27573",
+      "templateHash": "11309081834623879290"
+    },
+    "name": "platform-services",
+    "description": "Stamp for platform-services, allowing for multiple required resources.",
+    "owner": "Gullapalli-R"
+  },
+  "definitions": {
+    "workspaceFeaturesType": {
+      "type": "object",
+      "properties": {
+        "disableLocalAuth": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Disable Non-EntraID based Auth. Default is true."
+          }
+        },
+        "enableLogAccessUsingOnlyResourcePermissions": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Enable logging access using only resource permissions. Default is true."
+          }
+        }
+      },
+      "metadata": {
+        "description": "Features of the workspace."
+      }
+    },
+    "StoragePrivateEndpointGroupName": {
+      "type": "string",
+      "allowedValues": [
+        "blob",
+        "dfs",
+        "file",
+        "queue",
+        "table"
+      ]
+    },
+    "ContainerType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 63
+        }
+      }
+    },
+    "fileShareType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 63
+        }
+      }
+    },
+    "networkAclsType": {
+      "type": "object",
+      "properties": {
+        "bypass": {
+          "type": "string",
+          "allowedValues": [
+            "AzureServices",
+            "Logging",
+            "Logging, AzureServices",
+            "Logging, Metrics",
+            "Metrics"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Possible values are any combination of Logging, Metrics, AzureServices, or None."
+          }
+        },
+        "virtualNetworkRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "metadata": {
+                  "description": "Required. The resource ID of the virtual network subnet."
+                }
+              },
+              "action": {
+                "type": "string",
+                "allowedValues": [
+                  "Allow"
+                ],
+                "nullable": true,
+                "metadata": {
+                  "description": "Optional. The action of the virtual network rule."
+                }
+              }
+            }
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Sets the virtual network rules."
+          }
+        },
+        "ipRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string",
+                "metadata": {
+                  "description": "Required. Specifies the IP or IP range in CIDR format. Only IPV4 address is allowed."
+                }
+              },
+              "action": {
+                "type": "string",
+                "allowedValues": [
+                  "Allow"
+                ],
+                "nullable": true,
+                "metadata": {
+                  "description": "Optional. The action of the IP ACL rule."
+                }
+              }
+            }
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Sets the IP ACL rules."
+          }
+        },
+        "defaultAction": {
+          "type": "string",
+          "allowedValues": [
+            "Allow",
+            "Deny"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Specifies the default action of allow or deny when no other rules match."
+          }
+        }
+      }
+    },
+    "StorageConfiguration": {
+      "type": "object",
+      "properties": {
+        "shortName": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 10,
+          "metadata": {
+            "description": "Short name of Storage Account. Must be unique within Azure."
+          }
+        },
+        "allowSharedKeyAccess": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Whether or not to allow shared key access."
+          }
+        },
+        "hierarchicalNamespaceEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Enable Hierarchical Namespace (Azure Data Lake Storage v2). This cannot be changed once set to true."
+          }
+        },
+        "nfsV3Enabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "If true, enables NFS 3.0 support for the storage account. Requires enableHierarchicalNamespace to be true."
+          }
+        },
+        "sftpEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Enable Secure File Transfer Protocol. This can be enabled only on hierarchicalnamespace enabled stg accounts."
+          }
+        },
+        "sku": {
+          "type": "string",
+          "allowedValues": [
+            "Premium_LRS",
+            "Premium_ZRS",
+            "Standard_GRS",
+            "Standard_GZRS",
+            "Standard_LRS",
+            "Standard_RAGRS",
+            "Standard_RAGZRS",
+            "Standard_ZRS"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Storage SKU to use: https://learn.microsoft.com/en-us/rest/api/storagerp/srp_sku_types ."
+          }
+        },
+        "kind": {
+          "type": "string",
+          "allowedValues": [
+            "BlobStorage",
+            "BlockBlobStorage",
+            "FileStorage",
+            "Storage",
+            "StorageV2"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Storage account type (usually should be StorageV2 except in more special cases)."
+          }
+        },
+        "accessTier": {
+          "type": "string",
+          "allowedValues": [
+            "Cold",
+            "Cool",
+            "Hot",
+            "Premium"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Conditional. Required if the Storage Account kind is set to BlobStorage. The access tier is used for billing. The \"Premium\" access tier is the default value for premium block blobs storage account type and it cannot be changed for the premium block blobs storage account type."
+          }
+        },
+        "allowedCopyScope": {
+          "type": "string",
+          "allowedValues": [
+            "AAD",
+            "PrivateLink"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet."
+          }
+        },
+        "enablePrivateEndpoints": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Set to false to skip private endpoint creation for this storage account. Default is true."
+          }
+        },
+        "privateEndpointGroupNames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StoragePrivateEndpointGroupName"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Create the specified private endpoints for the storage account. By default, will create endpoints for `blob`, and if you enable Hierarchical Namespaces, it will create `dfs` as well. Be careful to avoid adding duplicates, it will likely cause the deployment to fail, but won't tell you at compile time (yet)."
+          }
+        },
+        "deleteRetentionPolicyDays": {
+          "type": "int",
+          "nullable": true,
+          "minValue": 1,
+          "maxValue": 365,
+          "metadata": {
+            "description": "Indicates the number of days that the deleted item should be retained. The minimum specified value can be 1 and the maximum value can be 365."
+          }
+        },
+        "containers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContainerType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Blob Containers to create with the storage account"
+          }
+        },
+        "managementPolicyRules": {
+          "type": "array",
+          "nullable": true,
+          "metadata": {
+            "description": "The Storage Account ManagementPolicies Rules."
+          }
+        },
+        "tags": {
+          "type": "object",
+          "nullable": true,
+          "metadata": {
+            "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+          }
+        },
+        "diagnosticLogWorkspaceId": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Resource ID for the log workspace if adding diagnostic settings"
+          }
+        },
+        "deleteRetentionPolicyEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The blob service properties for blob soft delete."
+          }
+        },
+        "fileShares": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/fileShareType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional array of file shares to create in the storage accounts"
+          }
+        },
+        "allowContainerPermanentDelete": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. This property when set to true allows deletion of the soft deleted containers."
+          }
+        },
+        "containerDeleteRetentionPolicyDays": {
+          "type": "int",
+          "nullable": true,
+          "minValue": 1,
+          "maxValue": 365,
+          "metadata": {
+            "description": "Optional. Indicates the number of days that the deleted containers should be retained."
+          }
+        },
+        "containerDeleteRetentionPolicy": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The blob service properties for container soft delete. Indicates whether DeleteRetentionPolicy is enabled."
+          }
+        },
+        "networkAcls": {
+          "$ref": "#/definitions/networkAclsType",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Networks ACLs, this value contains IPs to whitelist and/or Subnet information. If in use, bypass needs to be supplied. For security reasons, it is recommended to set the DefaultAction Deny."
+          }
+        },
+        "publicNetworkAccess": {
+          "type": "string",
+          "allowedValues": [
+            "Disabled",
+            "Enabled"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Whether or not public network access is allowed for this resource. For security reasons it should be disabled. If not specified, it will be disabled by default if private endpoints are set and networkAcls are not set."
+          }
+        },
+        "isVersioningEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Use versioning to automatically maintain previous versions of your blobs. Cannot be enabled for ADLS Gen2 storage accounts(hierarchicalNamespaceEnabled set to true)."
+          }
+        }
+      }
+    },
+    "ContainerRegistryConfiguration": {
+      "type": "object",
+      "properties": {
+        "shortName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "metadata": {
+            "description": "Short name used to generate the full ACR name. Provide only the suffix (e.g. \"01\" or \"acr01\"). Full ACR name = toLower(\"contreg\" + replace(environmentName, \"-\", \"\") + replace(name, \"-\", \"\") + shortName). Example: environmentName=\"BMRTEST\", name=\"data01\", shortName=\"acr01\" -> contregbmrtestdata01acr01"
+          }
+        },
+        "skuName": {
+          "type": "string",
+          "allowedValues": [
+            "Basic",
+            "Premium",
+            "Standard"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "The SKU of the container registry."
+          }
+        },
+        "adminUserEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Enable admin user that have push / pull permission to the registry. Default value is False"
+          }
+        },
+        "quarantinePolicyStatusEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The value that indicates whether the quarantine policy is enabled or not. Note, requires the 'acrSku' to be 'Premium'. Default value is False"
+          }
+        },
+        "retentionPolicyStatusEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The value that indicates whether the retention policy is enabled or not.  Default value is False"
+          }
+        },
+        "retentionPolicyDays": {
+          "type": "int",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The number of days to retain an untagged manifest after which it gets purged.  Default value is 7"
+          }
+        },
+        "exportPolicyStatusEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The value that indicates whether the export policy is enabled or not.  Default value is False"
+          }
+        },
+        "softDeletePolicyStatusEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Soft Delete policy status. Default value is False."
+          }
+        },
+        "softDeletePolicyDays": {
+          "type": "int",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The number of days after which a soft-deleted item is permanently deleted. Default value is 7"
+          }
+        },
+        "trustedServicesBypassEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Whether to allow trusted Azure services to access a network restricted registry. Default value is true"
+          }
+        },
+        "zoneRedundancyEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Whether or not zone redundancy is enabled for this container registry. Default value is false"
+          }
+        },
+        "anonymousPullEnabled": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Enables registry-wide pull from unauthenticated clients. It's in preview and available in the Standard and Premium service tiers. . Default value is false"
+          }
+        },
+        "lock": {
+          "type": "object",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The lock settings of the service."
+          }
+        },
+        "tags": {
+          "type": "object",
+          "nullable": true,
+          "metadata": {
+            "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+          }
+        }
+      }
+    },
+    "ResourceItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Geo-location of the resources."
+      }
+    },
+    "environmentName": {
+      "type": "string",
+      "metadata": {
+        "description": "Environment identifier representing the deployment stage (e.g., dev, stg, prd). Used to categorize and organize resources across different deployment environments. This value is incorporated into resource names for easy identification and tracking."
+      }
+    },
+    "name": {
+      "type": "string",
+      "defaultValue": "platform",
+      "metadata": {
+        "description": "Workload or service identifier for this platform-services stamp (e.g., infra, core, platform). Used to distinguish multiple platform-services stamps within the same environment. This value is incorporated into resource names to enable multiple deployments without conflicts."
+      }
+    },
+    "vnet_resourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the resource group of the virtual network."
+      }
+    },
+    "vnet_name": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the virtual network."
+      }
+    },
+    "vnet_privateLinkSubnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Private Link subnet."
+      }
+    },
+    "enableLogWorkspace": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable Log Workspace."
+      }
+    },
+    "enableStorage": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable Storage."
+      }
+    },
+    "enableContainerRegistry": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable Container Registry."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+      }
+    },
+    "dailyQuotaGb": {
+      "type": "int",
+      "defaultValue": 24,
+      "minValue": -1,
+      "metadata": {
+        "description": "The workspace daily quota for ingestion. Default value is 24."
+      }
+    },
+    "enableLogAnalyticsWorkspaceFeatures": {
+      "$ref": "#/definitions/workspaceFeaturesType",
+      "defaultValue": {
+        "disableLocalAuth": true,
+        "enableLogAccessUsingOnlyResourcePermissions": true
+      },
+      "metadata": {
+        "description": "Optional. The workspace features."
+      }
+    },
+    "storage_items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/StorageConfiguration"
+      },
+      "defaultValue": [],
+      "metadata": {
+        "description": "Storage Accounts to deploy."
+      }
+    },
+    "containerRegistry_items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ContainerRegistryConfiguration"
+      },
+      "defaultValue": [],
+      "metadata": {
+        "description": "Container Registries to deploy."
+      }
+    }
+  },
+  "variables": {
+    "subnet_privateLink": "[resourceId(parameters('vnet_resourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vnet_name'), parameters('vnet_privateLinkSubnet'))]"
+  },
+  "resources": {
+    "log": {
+      "condition": "[parameters('enableLogWorkspace')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('{0}-LOG', deployment().name)]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[format('LOG-{0}-{1}', toUpper(parameters('environmentName')), toUpper(parameters('name')))]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "dailyQuotaGb": {
+            "value": "[parameters('dailyQuotaGb')]"
+          },
+          "features": {
+            "value": {
+              "disableLocalAuth": "[coalesce(tryGet(parameters('enableLogAnalyticsWorkspaceFeatures'), 'disableLocalAuth'), true())]",
+              "enableLogAccessUsingOnlyResourcePermissions": "[coalesce(tryGet(parameters('enableLogAnalyticsWorkspaceFeatures'), 'enableLogAccessUsingOnlyResourcePermissions'), true())]"
+            }
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.38.33.27573",
+              "templateHash": "11965093868099373183"
+            },
+            "name": "Log Analytics Workspace",
+            "description": "Construct for Log Analytics Workspace",
+            "owner": "Gullapalli-R"
+          },
+          "definitions": {
+            "workspaceFeaturesType": {
+              "type": "object",
+              "properties": {
+                "disableLocalAuth": {
+                  "type": "bool",
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Disable Non-EntraID based Auth. Default is true."
+                  }
+                },
+                "enableDataExport": {
+                  "type": "bool",
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Flag that indicate if data should be exported."
+                  }
+                },
+                "enableLogAccessUsingOnlyResourcePermissions": {
+                  "type": "bool",
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Enable log access using only resource permissions. Default is false."
+                  }
+                },
+                "immediatePurgeDataOn30Days": {
+                  "type": "bool",
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Flag that describes if we want to remove the data after 30 days."
+                  }
+                }
+              },
+              "metadata": {
+                "description": "Features of the workspace."
+              }
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "The geo-location where the resource lives."
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 4,
+              "maxLength": 63,
+              "metadata": {
+                "description": "The resource name."
+              }
+            },
+            "sku": {
+              "type": "string",
+              "defaultValue": "PerGB2018",
+              "allowedValues": [
+                "CapacityReservation",
+                "Free",
+                "LACluster",
+                "PerGB2018",
+                "PerNode",
+                "Premium",
+                "Standalone",
+                "Standard"
+              ],
+              "metadata": {
+                "description": "The name of the SKU."
+              }
+            },
+            "features": {
+              "$ref": "#/definitions/workspaceFeaturesType",
+              "nullable": true,
+              "metadata": {
+                "description": "Optional. The workspace features."
+              }
+            },
+            "publicNetworkAccessForIngestionEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "The network access type for accessing Log Analytics ingestion."
+              }
+            },
+            "publicNetworkAccessForQueryEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "The network access type for accessing Log Analytics query."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {},
+              "metadata": {
+                "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+              }
+            },
+            "dailyQuotaGb": {
+              "type": "int",
+              "defaultValue": 24,
+              "minValue": -1,
+              "metadata": {
+                "description": "The workspace daily quota for ingestion. Default value is 24."
+              }
+            }
+          },
+          "resources": {
+            "logWorkspace": {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2025-02-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "features": {
+                  "searchVersion": 1,
+                  "enableLogAccessUsingOnlyResourcePermissions": "[coalesce(tryGet(parameters('features'), 'enableLogAccessUsingOnlyResourcePermissions'), false())]",
+                  "disableLocalAuth": "[coalesce(tryGet(parameters('features'), 'disableLocalAuth'), true())]",
+                  "enableDataExport": "[coalesce(tryGet(parameters('features'), 'enableDataExport'), false())]",
+                  "immediatePurgeDataOn30Days": "[coalesce(tryGet(parameters('features'), 'immediatePurgeDataOn30Days'), false())]"
+                },
+                "sku": {
+                  "name": "[parameters('sku')]"
+                },
+                "workspaceCapping": {
+                  "dailyQuotaGb": "[parameters('dailyQuotaGb')]"
+                },
+                "publicNetworkAccessForIngestion": "[if(parameters('publicNetworkAccessForIngestionEnabled'), 'Enabled', 'Disabled')]",
+                "publicNetworkAccessForQuery": "[if(parameters('publicNetworkAccessForQueryEnabled'), 'Enabled', 'Disabled')]"
+              }
+            }
+          },
+          "outputs": {
+            "id": {
+              "type": "string",
+              "metadata": {
+                "description": "Identifier for the resource."
+              },
+              "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('name'))]"
+            },
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the resource."
+              },
+              "value": "[parameters('name')]"
+            }
+          }
+        }
+      }
+    },
+    "storage": {
+      "copy": {
+        "name": "storage",
+        "count": "[length(if(parameters('enableStorage'), parameters('storage_items'), createArray()))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('{0}-ST-{1}', deployment().name, copyIndex())]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[toLower(format('st{0}{1}{2}', replace(parameters('environmentName'), '-', ''), replace(parameters('name'), '-', ''), if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()].shortName))]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tags": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'tags'), parameters('tags'))]"
+          },
+          "subnetId": {
+            "value": "[variables('subnet_privateLink')]"
+          },
+          "hierarchicalNamespaceEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'hierarchicalNamespaceEnabled'), false())]"
+          },
+          "allowSharedKeyAccess": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'allowSharedKeyAccess'), false())]"
+          },
+          "sku": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'sku'), 'Standard_LRS')]"
+          },
+          "kind": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'kind'), 'StorageV2')]"
+          },
+          "accessTier": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'accessTier'), 'Hot')]"
+          },
+          "nfsV3Enabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'nfsV3Enabled'), false())]"
+          },
+          "sftpEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'sftpEnabled'), false())]"
+          },
+          "allowedCopyScope": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'allowedCopyScope'), 'PrivateLink')]"
+          },
+          "privateEndpointGroupNames": {
+            "value": "[tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'privateEndpointGroupNames')]"
+          },
+          "containers": {
+            "value": "[tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'containers')]"
+          },
+          "deleteRetentionPolicyDays": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'deleteRetentionPolicyDays'), 30)]"
+          },
+          "managementPolicyRules": {
+            "value": "[tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'managementPolicyRules')]"
+          },
+          "deleteRetentionPolicyEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'deleteRetentionPolicyEnabled'), true())]"
+          },
+          "diagnosticLogWorkspaceId": "[if(parameters('enableLogWorkspace'), createObject('value', reference('log').outputs.id.value), createObject('value', ''))]",
+          "fileShares": {
+            "value": "[tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'fileShares')]"
+          },
+          "allowContainerPermanentDelete": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'allowContainerPermanentDelete'), false())]"
+          },
+          "containerDeleteRetentionPolicy": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'containerDeleteRetentionPolicy'), false())]"
+          },
+          "containerDeleteRetentionPolicyDays": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'containerDeleteRetentionPolicyDays'), 30)]"
+          },
+          "networkAcls": {
+            "value": "[tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'networkAcls')]"
+          },
+          "publicNetworkAccess": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'publicNetworkAccess'), 'Disabled')]"
+          },
+          "isVersioningEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableStorage'), parameters('storage_items'), createArray())[copyIndex()], 'isVersioningEnabled'), false())]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.38.33.27573",
+              "templateHash": "16098929360121858703"
+            },
+            "name": "Storage Account Construct",
+            "description": "Construct for using a storage account with private endpoints, diagnostics, and common settings.",
+            "owner": "Gullapalli-R"
+          },
+          "definitions": {
+            "StoragePrivateEndpointGroupName": {
+              "type": "string",
+              "allowedValues": [
+                "blob",
+                "dfs",
+                "file",
+                "queue",
+                "table"
+              ]
+            },
+            "ContainerType": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 63
+                }
+              }
+            },
+            "networkAclsType": {
+              "type": "object",
+              "properties": {
+                "resourceAccessRules": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "tenantId": {
+                        "type": "string",
+                        "metadata": {
+                          "description": "Required. The ID of the tenant in which the resource resides in."
+                        }
+                      },
+                      "resourceId": {
+                        "type": "string",
+                        "metadata": {
+                          "description": "Required. The resource ID of the target service. Can also contain a wildcard, if multiple services e.g. in a resource group should be included."
+                        }
+                      }
+                    }
+                  },
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Sets the resource access rules. Array entries must consist of \"tenantId\" and \"resourceId\" fields only."
+                  }
+                },
+                "bypass": {
+                  "type": "string",
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Possible values are any combination of Logging, Metrics, AzureServices, or None."
+                  }
+                },
+                "virtualNetworkRules": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "metadata": {
+                          "description": "Required. The resource ID of the virtual network subnet."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "allowedValues": [
+                          "Allow"
+                        ],
+                        "nullable": true,
+                        "metadata": {
+                          "description": "Optional. The action of the virtual network rule."
+                        }
+                      }
+                    }
+                  },
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Sets the virtual network rules."
+                  }
+                },
+                "ipRules": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "metadata": {
+                          "description": "Required. Specifies the IP or IP range in CIDR format. Only IPV4 address is allowed."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "allowedValues": [
+                          "Allow"
+                        ],
+                        "nullable": true,
+                        "metadata": {
+                          "description": "Optional. The action of the IP ACL rule."
+                        }
+                      }
+                    }
+                  },
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Sets the IP ACL rules."
+                  }
+                },
+                "defaultAction": {
+                  "type": "string",
+                  "allowedValues": [
+                    "Allow",
+                    "Deny"
+                  ],
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Specifies the default action of allow or deny when no other rules match."
+                  }
+                }
+              },
+              "metadata": {
+                "__bicep_export!": true,
+                "description": "The type for network ACLs configuration."
+              }
+            },
+            "fileShare": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "metadata": {
+                    "description": "Name of the fileShare"
+                  }
+                },
+                "accessTier": {
+                  "type": "string",
+                  "allowedValues": [
+                    "Cool",
+                    "Hot",
+                    "Premium",
+                    "TransactionOptimized",
+                    "null"
+                  ],
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Conditional. Access tier for specific share. Required if the Storage Account kind is set to FileStorage (should be set to \"Premium\"). GpV2 account can choose between TransactionOptimized (default), Hot, and Cool."
+                  }
+                },
+                "shareQuota": {
+                  "type": "int",
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. The maximum size of the share, in gigabytes. Must be greater than 0, and less than or equal to 5120 (5TB). For Large File Shares, the maximum size is 102400 (100TB)."
+                  }
+                },
+                "rootSquash": {
+                  "type": "string",
+                  "allowedValues": [
+                    "AllSquash",
+                    "NoRootSquash",
+                    "RootSquash",
+                    "null"
+                  ],
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Permissions for NFS file shares are enforced by the client OS rather than the Azure Files service. Toggling the root squash behavior reduces the rights of the root user for NFS shares."
+                  }
+                },
+                "enabledProtocols": {
+                  "type": "string",
+                  "allowedValues": [
+                    "NFS",
+                    "SMB",
+                    "null"
+                  ],
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. The authentication protocol that is used for the file share. Can only be specified when creating a share."
+                  }
+                }
+              },
+              "metadata": {
+                "__bicep_export!": true,
+                "description": "The type for a shared file"
+              }
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "The Geo-location where the resource lives."
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 24,
+              "metadata": {
+                "description": "Name of Storage Account. Must be unique within Azure."
+              }
+            },
+            "sku": {
+              "type": "string",
+              "defaultValue": "Standard_ZRS",
+              "allowedValues": [
+                "Premium_LRS",
+                "Premium_ZRS",
+                "Standard_GRS",
+                "Standard_GZRS",
+                "Standard_LRS",
+                "Standard_RAGRS",
+                "Standard_RAGZRS",
+                "Standard_ZRS"
+              ],
+              "metadata": {
+                "description": "Storage SKU to use: https://learn.microsoft.com/en-us/rest/api/storagerp/srp_sku_types ."
+              }
+            },
+            "kind": {
+              "type": "string",
+              "defaultValue": "StorageV2",
+              "allowedValues": [
+                "BlobStorage",
+                "BlockBlobStorage",
+                "FileStorage",
+                "Storage",
+                "StorageV2"
+              ],
+              "metadata": {
+                "description": "Storage account type (usually should be StorageV2 except in more special cases)."
+              }
+            },
+            "hierarchicalNamespaceEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Enable Hierarchical Namespace (Azure Data Lake Storage v2). This cannot be changed once set to true."
+              }
+            },
+            "nfsV3Enabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "If true, enables NFS 3.0 support for the storage account. Requires enableHierarchicalNamespace to be true."
+              }
+            },
+            "sftpEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Enable Secure File Transfer Protocol. This can be enabled only on hierarchicalnamespace enabled stg accounts."
+              }
+            },
+            "allowSharedKeyAccess": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Whether or not to allow shared key access."
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "The ID of the subnet from which the private IP will be allocated."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {},
+              "metadata": {
+                "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+              }
+            },
+            "diagnosticLogWorkspaceId": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "Resource ID for the log workspace if adding diagnostic settings"
+              }
+            },
+            "deleteRetentionPolicyDays": {
+              "type": "int",
+              "defaultValue": 30,
+              "minValue": 1,
+              "maxValue": 365,
+              "metadata": {
+                "description": "Indicates the number of days that the deleted item should be retained. The minimum specified value can be 1 and the maximum value can be 365."
+              }
+            },
+            "deleteRetentionPolicyEnabled": {
+              "type": "bool",
+              "defaultValue": true,
+              "metadata": {
+                "description": "Optional. The blob service properties for blob soft delete."
+              }
+            },
+            "allowPermanentDelete": {
+              "type": "bool",
+              "defaultValue": true,
+              "metadata": {
+                "description": "This property when set to true allows deletion of the soft deleted blob versions and snapshots. This property cannot be used blob restore policy. This property only applies to blob service and does not apply to containers or file share."
+              }
+            },
+            "managementPolicyRules": {
+              "type": "array",
+              "nullable": true,
+              "metadata": {
+                "description": "The Storage Account ManagementPolicies Rules. If not provided, a default lifecycle rule (default-rule-1) is applied. For HNS accounts the default includes baseBlob + snapshot tiering actions; for non-HNS accounts it also includes version tiering actions."
+              }
+            },
+            "privateEndpointGroupNames": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StoragePrivateEndpointGroupName"
+              },
+              "nullable": true,
+              "metadata": {
+                "description": "Create the specified private endpoints for the storage account. By default, will create endpoints for `blob`, and if you enable Hierarchical Namespaces, it will create `dfs` as well. Be careful to avoid adding duplicates, it will likely cause the deployment to fail, but won't tell you at compile time (yet)."
+              }
+            },
+            "allowedCopyScope": {
+              "type": "string",
+              "defaultValue": "PrivateLink",
+              "allowedValues": [
+                "AAD",
+                "PrivateLink"
+              ],
+              "metadata": {
+                "description": "Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet."
+              }
+            },
+            "containers": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ContainerType"
+              },
+              "defaultValue": [],
+              "metadata": {
+                "description": "Blob Containers to create with the storage account"
+              }
+            },
+            "containerDeleteRetentionPolicy": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Optional. The blob service properties for container soft delete. Indicates whether DeleteRetentionPolicy is enabled."
+              }
+            },
+            "containerDeleteRetentionPolicyDays": {
+              "type": "int",
+              "defaultValue": 30,
+              "minValue": 1,
+              "maxValue": 365,
+              "metadata": {
+                "description": "Optional. Indicates the number of days that the deleted containers should be retained."
+              }
+            },
+            "allowContainerPermanentDelete": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "This property when set to true allows deletion of the soft deleted containers."
+              }
+            },
+            "isVersioningEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Optional. Use versioning to automatically maintain previous versions of your blobs. Cannot be enabled for ADLS Gen2 storage accounts(hierarchicalNamespaceEnabled set to true)."
+              }
+            },
+            "accessTier": {
+              "type": "string",
+              "defaultValue": "Hot",
+              "allowedValues": [
+                "Premium",
+                "Hot",
+                "Cool",
+                "Cold"
+              ],
+              "metadata": {
+                "description": "Conditional. Required if the Storage Account kind is set to BlobStorage. The access tier is used for billing. The \"Premium\" access tier is the default value for premium block blobs storage account type and it cannot be changed for the premium block blobs storage account type."
+              }
+            },
+            "networkAcls": {
+              "$ref": "#/definitions/networkAclsType",
+              "nullable": true,
+              "metadata": {
+                "description": "Optional. Networks ACLs, this value contains IPs to whitelist and/or Subnet information. If in use, bypass needs to be supplied. For security reasons, it is recommended to set the DefaultAction Deny."
+              }
+            },
+            "publicNetworkAccess": {
+              "type": "string",
+              "nullable": true,
+              "allowedValues": [
+                "Enabled",
+                "Disabled"
+              ],
+              "metadata": {
+                "description": "Optional. Whether or not public network access is allowed for this resource. For security reasons it should be disabled. If not specified, it will be disabled by default if private endpoints are set and networkAcls are not set."
+              }
+            },
+            "fileShares": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/fileShare"
+              },
+              "nullable": true,
+              "metadata": {
+                "description": "Optional. Fileshares to create with the storage account"
+              }
+            }
+          },
+          "variables": {
+            "defaultStorageEndpointGroups": "[concat(createArray('blob'), if(parameters('hierarchicalNamespaceEnabled'), createArray('dfs'), createArray()))]",
+            "defaultManagementNonHnsPolicyRules": [
+              {
+                "definition": {
+                  "actions": {
+                    "baseBlob": {
+                      "tierToCool": {
+                        "daysAfterModificationGreaterThan": 90
+                      }
+                    },
+                    "snapshot": {
+                      "tierToCool": {
+                        "daysAfterCreationGreaterThan": 90
+                      }
+                    },
+                    "version": {
+                      "tierToCool": {
+                        "daysAfterCreationGreaterThan": 90
+                      }
+                    }
+                  },
+                  "filters": {
+                    "blobTypes": [
+                      "blockBlob"
+                    ]
+                  }
+                },
+                "enabled": true,
+                "name": "default-NonHns-rule-1",
+                "type": "Lifecycle"
+              }
+            ],
+            "defaultManagementHnsPolicyRules": [
+              {
+                "definition": {
+                  "actions": {
+                    "baseBlob": {
+                      "tierToCool": {
+                        "daysAfterModificationGreaterThan": 3650
+                      }
+                    },
+                    "snapshot": {
+                      "tierToCool": {
+                        "daysAfterCreationGreaterThan": 3650
+                      }
+                    }
+                  },
+                  "filters": {
+                    "blobTypes": [
+                      "blockBlob"
+                    ]
+                  }
+                },
+                "enabled": true,
+                "name": "default-Hns-rule-1",
+                "type": "Lifecycle"
+              }
+            ],
+            "blobCategories": [
+              "allLogs",
+              "audit"
+            ],
+            "storageCategories": [
+              "Transaction"
+            ]
+          },
+          "resources": {
+            "storage": {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2025-06-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "kind": "[parameters('kind')]",
+              "sku": {
+                "name": "[parameters('sku')]"
+              },
+              "properties": {
+                "minimumTlsVersion": "TLS1_2",
+                "accessTier": "[if(and(not(equals(parameters('kind'), 'Storage')), not(equals(parameters('kind'), 'BlockBlobStorage'))), parameters('accessTier'), null())]",
+                "supportsHttpsTrafficOnly": true,
+                "publicNetworkAccess": "[if(not(empty(parameters('publicNetworkAccess'))), parameters('publicNetworkAccess'), if(and(not(empty(parameters('privateEndpointGroupNames'))), empty(parameters('networkAcls'))), 'Disabled', null()))]",
+                "allowBlobPublicAccess": false,
+                "allowSharedKeyAccess": "[parameters('allowSharedKeyAccess')]",
+                "allowCrossTenantReplication": false,
+                "defaultToOAuthAuthentication": true,
+                "isHnsEnabled": "[parameters('hierarchicalNamespaceEnabled')]",
+                "isNfsV3Enabled": "[parameters('nfsV3Enabled')]",
+                "isSftpEnabled": "[parameters('sftpEnabled')]",
+                "allowedCopyScope": "[parameters('allowedCopyScope')]",
+                "encryption": {
+                  "keySource": "Microsoft.Storage",
+                  "services": {
+                    "blob": {
+                      "enabled": true,
+                      "keyType": "Account"
+                    },
+                    "file": {
+                      "enabled": true,
+                      "keyType": "Account"
+                    },
+                    "table": {
+                      "enabled": true,
+                      "keyType": "Account"
+                    },
+                    "queue": {
+                      "enabled": true,
+                      "keyType": "Account"
+                    }
+                  },
+                  "requireInfrastructureEncryption": true
+                },
+                "networkAcls": "[if(not(empty(parameters('networkAcls'))), createObject('resourceAccessRules', tryGet(parameters('networkAcls'), 'resourceAccessRules'), 'defaultAction', coalesce(tryGet(parameters('networkAcls'), 'defaultAction'), 'Deny'), 'virtualNetworkRules', tryGet(parameters('networkAcls'), 'virtualNetworkRules'), 'ipRules', tryGet(parameters('networkAcls'), 'ipRules'), 'bypass', tryGet(parameters('networkAcls'), 'bypass')), createObject('bypass', 'AzureServices', 'defaultAction', 'Deny'))]"
+              }
+            },
+            "fileService": {
+              "type": "Microsoft.Storage/storageAccounts/fileServices",
+              "apiVersion": "2025-06-01",
+              "name": "[format('{0}/{1}', parameters('name'), 'default')]",
+              "dependsOn": [
+                "storage"
+              ]
+            },
+            "fileshares": {
+              "copy": {
+                "name": "fileshares",
+                "count": "[length(coalesce(parameters('fileShares'), createArray()))]"
+              },
+              "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+              "apiVersion": "2025-06-01",
+              "name": "[format('{0}/{1}/{2}', parameters('name'), 'default', coalesce(parameters('fileShares'), createArray())[copyIndex()].name)]",
+              "properties": {
+                "accessTier": "[coalesce(tryGet(coalesce(parameters('fileShares'), createArray())[copyIndex()], 'accessTier'), 'TransactionOptimized')]",
+                "shareQuota": "[coalesce(tryGet(coalesce(parameters('fileShares'), createArray())[copyIndex()], 'shareQuota'), 1)]",
+                "enabledProtocols": "[coalesce(tryGet(coalesce(parameters('fileShares'), createArray())[copyIndex()], 'enabledProtocols'), 'SMB')]",
+                "rootSquash": "[coalesce(tryGet(coalesce(parameters('fileShares'), createArray())[copyIndex()], 'rootSquash'), if(equals(tryGet(coalesce(parameters('fileShares'), createArray())[copyIndex()], 'enabledProtocols'), 'NFS'), tryGet(coalesce(parameters('fileShares'), createArray())[copyIndex()], 'rootSquash'), null()))]"
+              },
+              "dependsOn": [
+                "fileService"
+              ]
+            },
+            "blobServices": {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2025-06-01",
+              "name": "[format('{0}/{1}', parameters('name'), 'default')]",
+              "properties": {
+                "deleteRetentionPolicy": {
+                  "enabled": "[parameters('deleteRetentionPolicyEnabled')]",
+                  "days": "[parameters('deleteRetentionPolicyDays')]",
+                  "allowPermanentDelete": "[parameters('allowPermanentDelete')]"
+                },
+                "containerDeleteRetentionPolicy": {
+                  "allowPermanentDelete": "[parameters('allowContainerPermanentDelete')]",
+                  "days": "[parameters('containerDeleteRetentionPolicyDays')]",
+                  "enabled": "[parameters('containerDeleteRetentionPolicy')]"
+                },
+                "isVersioningEnabled": "[if(not(parameters('hierarchicalNamespaceEnabled')), parameters('isVersioningEnabled'), false())]"
+              },
+              "dependsOn": [
+                "storage"
+              ]
+            },
+            "blobContainer": {
+              "copy": {
+                "name": "blobContainer",
+                "count": "[length(parameters('containers'))]"
+              },
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2025-06-01",
+              "name": "[format('{0}/{1}/{2}', parameters('name'), 'default', parameters('containers')[copyIndex()].name)]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "blobServices"
+              ]
+            },
+            "diagnosticsblobServices": {
+              "condition": "[not(empty(parameters('diagnosticLogWorkspaceId')))]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}/blobServices/{1}', parameters('name'), 'default')]",
+              "name": "default-diagnostics",
+              "properties": {
+                "copy": [
+                  {
+                    "name": "logs",
+                    "count": "[length(variables('blobCategories'))]",
+                    "input": {
+                      "enabled": true,
+                      "categoryGroup": "[variables('blobCategories')[copyIndex('logs')]]"
+                    }
+                  }
+                ],
+                "workspaceId": "[parameters('diagnosticLogWorkspaceId')]"
+              },
+              "dependsOn": [
+                "blobServices"
+              ]
+            },
+            "diagnosticsStorage": {
+              "condition": "[not(empty(parameters('diagnosticLogWorkspaceId')))]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('name'))]",
+              "name": "default-diagnostics",
+              "properties": {
+                "copy": [
+                  {
+                    "name": "metrics",
+                    "count": "[length(variables('storageCategories'))]",
+                    "input": {
+                      "enabled": true,
+                      "category": "[variables('storageCategories')[copyIndex('metrics')]]"
+                    }
+                  }
+                ],
+                "workspaceId": "[parameters('diagnosticLogWorkspaceId')]"
+              },
+              "dependsOn": [
+                "storage"
+              ]
+            },
+            "managementPolicies": {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "[take(format('{0}-ST-MP', deployment().name), 64)]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "storageAccountName": {
+                    "value": "[parameters('name')]"
+                  },
+                  "rules": {
+                    "value": "[coalesce(parameters('managementPolicyRules'), if(parameters('hierarchicalNamespaceEnabled'), variables('defaultManagementHnsPolicyRules'), variables('defaultManagementNonHnsPolicyRules')))]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "10435272663353388943"
+                    }
+                  },
+                  "parameters": {
+                    "storageAccountName": {
+                      "type": "string",
+                      "maxLength": 24,
+                      "metadata": {
+                        "description": "Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment."
+                      }
+                    },
+                    "rules": {
+                      "type": "array",
+                      "metadata": {
+                        "description": "Required. The Storage Account ManagementPolicies Rules."
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Storage/storageAccounts/managementPolicies",
+                      "apiVersion": "2025-06-01",
+                      "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+                      "properties": {
+                        "policy": {
+                          "rules": "[parameters('rules')]"
+                        }
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "resourceId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the deployed management policy."
+                      },
+                      "value": "default"
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the deployed management policy."
+                      },
+                      "value": "default"
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "storage"
+              ]
+            },
+            "privateEndpoint": {
+              "copy": {
+                "name": "privateEndpoint",
+                "count": "[length(coalesce(parameters('privateEndpointGroupNames'), variables('defaultStorageEndpointGroups')))]"
+              },
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "[take(format('{0}-ST-PE-{1}-{2}', deployment().name, coalesce(parameters('privateEndpointGroupNames'), variables('defaultStorageEndpointGroups'))[copyIndex()], copyIndex()), 64)]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "name": {
+                    "value": "[format('{0}-{1}-PE', parameters('name'), coalesce(parameters('privateEndpointGroupNames'), variables('defaultStorageEndpointGroups'))[copyIndex()])]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "endpointGroupId": {
+                    "value": "[coalesce(parameters('privateEndpointGroupNames'), variables('defaultStorageEndpointGroups'))[copyIndex()]]"
+                  },
+                  "serviceId": {
+                    "value": "[resourceId('Microsoft.Storage/storageAccounts', parameters('name'))]"
+                  },
+                  "subnetId": {
+                    "value": "[parameters('subnetId')]"
+                  },
+                  "tags": {
+                    "value": "[parameters('tags')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "7221841512582795938"
+                    },
+                    "name": "Private Endpoint",
+                    "description": "Private Endpoint used for accessing private resources on POC internal networks",
+                    "owner": "Gullapalli-R"
+                  },
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 64,
+                      "metadata": {
+                        "description": "The resource name."
+                      }
+                    },
+                    "location": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The Geo-location where the resource lives."
+                      }
+                    },
+                    "subnetId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The ID of the subnet from which the private IP will be allocated."
+                      }
+                    },
+                    "serviceId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource id of private link service (the service being linked privately)."
+                      }
+                    },
+                    "tags": {
+                      "type": "object",
+                      "defaultValue": {},
+                      "metadata": {
+                        "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+                      }
+                    },
+                    "endpointGroupId": {
+                      "type": "string",
+                      "allowedValues": [
+                        "account",
+                        "amlworkspace",
+                        "API",
+                        "application gateway",
+                        "AzureBackup",
+                        "azuremonitor",
+                        "AzureSiteRecovery",
+                        "batchAccount",
+                        "blob",
+                        "blob_secondary",
+                        "browser_authentication",
+                        "Cassandra",
+                        "cluster",
+                        "configurationStores",
+                        "coordinator",
+                        "databricks_ui_api",
+                        "dataFactory",
+                        "Dev",
+                        "dfs",
+                        "dfs_secondary",
+                        "domain",
+                        "DSCAndHybridWorker",
+                        "empty",
+                        "eventHub",
+                        "fhir",
+                        "file",
+                        "File Sync Service",
+                        "file_secondary",
+                        "Gremlin",
+                        "Gateway",
+                        "hosting environment",
+                        "hybridcompute",
+                        "HSM",
+                        "IoTApps",
+                        "iotDps",
+                        "iotHub",
+                        "keydelivery",
+                        "liveevent",
+                        "managed disk",
+                        "management",
+                        "mariadbServer",
+                        "MongoDB",
+                        "mysqlServer",
+                        "namespace",
+                        "nodeManagement",
+                        "portal",
+                        "postgresqlServer",
+                        "Power BI",
+                        "project",
+                        "queue",
+                        "queue_secondary",
+                        "redisCache",
+                        "redisEnterprise",
+                        "registry",
+                        "ResourceManagement",
+                        "searchService",
+                        "signalr",
+                        "sites",
+                        "sites-slot-dev",
+                        "sites-slot-qa",
+                        "sites-slot-testing",
+                        "sites-slot-staging",
+                        "sites-slot-preprod",
+                        "sites-slot-prod",
+                        "SQL",
+                        "SqlOnDemand",
+                        "sqlServer",
+                        "staticSites",
+                        "streamingendpoint",
+                        "Table",
+                        "table",
+                        "table_secondary",
+                        "topic",
+                        "vault",
+                        "web",
+                        "web_secondary",
+                        "Webhook",
+                        "webpubsub",
+                        "grafana",
+                        "prometheusMetrics",
+                        "Bot",
+                        "AzureBackup",
+                        "AzureSiteRecovery",
+                        "managedEnvironments"
+                      ],
+                      "metadata": {
+                        "description": "The ID of the group obtained from the remote resource that this private endpoint should connect to (https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview)."
+                      }
+                    },
+                    "requiresManualApproval": {
+                      "type": "bool",
+                      "defaultValue": false,
+                      "metadata": {
+                        "description": "Whether or not manual approval for a Private Endpoint connection is required."
+                      }
+                    },
+                    "manualApprovalRequestMessage": {
+                      "type": "string",
+                      "defaultValue": "",
+                      "maxLength": 140,
+                      "metadata": {
+                        "description": "Message to pass on when requesting manual endpoint approval workflow."
+                      }
+                    }
+                  },
+                  "variables": {
+                    "privateLinkServiceConnection": {
+                      "name": "[parameters('name')]",
+                      "properties": {
+                        "privateLinkServiceId": "[parameters('serviceId')]",
+                        "groupIds": [
+                          "[parameters('endpointGroupId')]"
+                        ],
+                        "requestMessage": "[if(parameters('requiresManualApproval'), parameters('manualApprovalRequestMessage'), null())]"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/privateEndpoints",
+                      "apiVersion": "2023-11-01",
+                      "name": "[parameters('name')]",
+                      "location": "[parameters('location')]",
+                      "tags": "[parameters('tags')]",
+                      "properties": {
+                        "subnet": {
+                          "id": "[parameters('subnetId')]"
+                        },
+                        "manualPrivateLinkServiceConnections": "[if(parameters('requiresManualApproval'), createArray(variables('privateLinkServiceConnection')), createArray())]",
+                        "privateLinkServiceConnections": "[if(parameters('requiresManualApproval'), createArray(), createArray(variables('privateLinkServiceConnection')))]",
+                        "customNetworkInterfaceName": "[format('{0}-NIC', parameters('name'))]"
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "id": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "ID of the resource."
+                      },
+                      "value": "[resourceId('Microsoft.Network/privateEndpoints', parameters('name'))]"
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Name of the resource."
+                      },
+                      "value": "[parameters('name')]"
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "storage"
+              ]
+            }
+          },
+          "outputs": {
+            "id": {
+              "type": "string",
+              "metadata": {
+                "description": "Identifier for the storage account"
+              },
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', parameters('name'))]"
+            },
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the storage account"
+              },
+              "value": "[parameters('name')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "log"
+      ]
+    },
+    "containerRegistry": {
+      "copy": {
+        "name": "containerRegistry",
+        "count": "[length(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray()))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('{0}-ACR-{1}', deployment().name, copyIndex())]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[toLower(format('contreg{0}{1}{2}', replace(parameters('environmentName'), '-', ''), replace(parameters('name'), '-', ''), if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()].shortName))]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tags": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'tags'), parameters('tags'))]"
+          },
+          "subnetId": {
+            "value": "[variables('subnet_privateLink')]"
+          },
+          "skuName": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'skuName'), 'Premium')]"
+          },
+          "adminUserEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'adminUserEnabled'), false())]"
+          },
+          "quarantinePolicyStatusEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'quarantinePolicyStatusEnabled'), false())]"
+          },
+          "retentionPolicyStatusEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'retentionPolicyStatusEnabled'), false())]"
+          },
+          "retentionPolicyDays": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'retentionPolicyDays'), 7)]"
+          },
+          "exportPolicyStatusEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'exportPolicyStatusEnabled'), false())]"
+          },
+          "softDeletePolicyStatusEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'softDeletePolicyStatusEnabled'), false())]"
+          },
+          "softDeletePolicyDays": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'softDeletePolicyDays'), 7)]"
+          },
+          "trustedServicesBypassEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'trustedServicesBypassEnabled'), true())]"
+          },
+          "zoneRedundancyEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'zoneRedundancyEnabled'), false())]"
+          },
+          "anonymousPullEnabled": {
+            "value": "[coalesce(tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'anonymousPullEnabled'), false())]"
+          },
+          "lock": {
+            "value": "[tryGet(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray())[copyIndex()], 'lock')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.38.33.27573",
+              "templateHash": "4407148976883567004"
+            },
+            "name": "Azure Container Registries (ACR)",
+            "description": "Construct for using an Azure Container Registries with private endpoint",
+            "owner": "Gullapalli-R"
+          },
+          "definitions": {
+            "LockType": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Specify the name of lock."
+                  }
+                },
+                "kind": {
+                  "type": "string",
+                  "allowedValues": [
+                    "CanNotDelete",
+                    "None",
+                    "ReadOnly"
+                  ],
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Specify the type of lock."
+                  }
+                }
+              }
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "The Geo-location where the resource lives."
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 50,
+              "metadata": {
+                "description": "Name of the resource."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {},
+              "metadata": {
+                "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+              }
+            },
+            "skuName": {
+              "type": "string",
+              "defaultValue": "Premium",
+              "allowedValues": [
+                "Basic",
+                "Premium",
+                "Standard"
+              ],
+              "metadata": {
+                "description": "The name of the SKU, Tier of Azure container registry."
+              }
+            },
+            "adminUserEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Enable admin user that have push / pull permission to the registry."
+              }
+            },
+            "quarantinePolicyStatusEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "The value that indicates whether the quarantine policy is enabled or not."
+              }
+            },
+            "retentionPolicyStatusEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "The value that indicates whether the retention policy is enabled or not. Default is disabled."
+              }
+            },
+            "retentionPolicyDays": {
+              "type": "int",
+              "defaultValue": 7,
+              "minValue": 1,
+              "maxValue": 365,
+              "metadata": {
+                "description": "The number of days to retain an untagged manifest after which it gets purged."
+              }
+            },
+            "exportPolicyStatusEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "The value that indicates whether the export policy is enabled or not. Default is disabled."
+              }
+            },
+            "softDeletePolicyStatusEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Soft Delete policy status. Default is disabled."
+              }
+            },
+            "softDeletePolicyDays": {
+              "type": "int",
+              "defaultValue": 7,
+              "minValue": 1,
+              "maxValue": 90,
+              "metadata": {
+                "description": "The number of days after which a soft-deleted item is permanently deleted."
+              }
+            },
+            "trustedServicesBypassEnabled": {
+              "type": "bool",
+              "defaultValue": true,
+              "metadata": {
+                "description": "Whether to allow trusted Azure services to access a network restricted registry."
+              }
+            },
+            "zoneRedundancyEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Whether or not zone redundancy is enabled for this container registry. Default is disabled."
+              }
+            },
+            "anonymousPullEnabled": {
+              "type": "bool",
+              "defaultValue": true,
+              "metadata": {
+                "description": "Enables registry-wide pull from unauthenticated clients."
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "The ID of the subnet from which the private IP will be allocated."
+              }
+            },
+            "lock": {
+              "$ref": "#/definitions/LockType",
+              "nullable": true,
+              "metadata": {
+                "description": "Lock configuration for the service."
+              }
+            }
+          },
+          "variables": {
+            "groupId": "registry"
+          },
+          "resources": {
+            "registry::scope_admin": {
+              "type": "Microsoft.ContainerRegistry/registries/scopeMaps",
+              "apiVersion": "2023-06-01-preview",
+              "name": "[format('{0}/{1}', parameters('name'), '_repositories_admin')]",
+              "properties": {
+                "description": "Can perform all read, write and delete operations on the registry",
+                "actions": [
+                  "repositories/*/metadata/read",
+                  "repositories/*/metadata/write",
+                  "repositories/*/content/read",
+                  "repositories/*/content/write",
+                  "repositories/*/content/delete"
+                ]
+              },
+              "dependsOn": [
+                "registry"
+              ]
+            },
+            "registry::scope_pull": {
+              "type": "Microsoft.ContainerRegistry/registries/scopeMaps",
+              "apiVersion": "2023-06-01-preview",
+              "name": "[format('{0}/{1}', parameters('name'), '_repositories_pull')]",
+              "properties": {
+                "description": "Can pull any repository of the registry",
+                "actions": [
+                  "repositories/*/content/read"
+                ]
+              },
+              "dependsOn": [
+                "registry"
+              ]
+            },
+            "registry::scope_push": {
+              "type": "Microsoft.ContainerRegistry/registries/scopeMaps",
+              "apiVersion": "2023-06-01-preview",
+              "name": "[format('{0}/{1}', parameters('name'), '_repositories_push')]",
+              "properties": {
+                "description": "Can push to any repository of the registry",
+                "actions": [
+                  "repositories/*/content/read",
+                  "repositories/*/content/write"
+                ]
+              },
+              "dependsOn": [
+                "registry"
+              ]
+            },
+            "registry": {
+              "type": "Microsoft.ContainerRegistry/registries",
+              "apiVersion": "2023-06-01-preview",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "sku": {
+                "name": "[parameters('skuName')]"
+              },
+              "properties": {
+                "adminUserEnabled": "[parameters('adminUserEnabled')]",
+                "networkRuleSet": {
+                  "defaultAction": "Deny",
+                  "ipRules": []
+                },
+                "policies": {
+                  "quarantinePolicy": {
+                    "status": "[if(parameters('quarantinePolicyStatusEnabled'), 'enabled', 'disabled')]"
+                  },
+                  "trustPolicy": {
+                    "type": "Notary",
+                    "status": "disabled"
+                  },
+                  "retentionPolicy": {
+                    "days": "[parameters('retentionPolicyDays')]",
+                    "status": "[if(parameters('retentionPolicyStatusEnabled'), 'enabled', 'disabled')]"
+                  },
+                  "exportPolicy": {
+                    "status": "[if(parameters('exportPolicyStatusEnabled'), 'enabled', 'disabled')]"
+                  },
+                  "azureADAuthenticationAsArmPolicy": {
+                    "status": "enabled"
+                  },
+                  "softDeletePolicy": {
+                    "retentionDays": "[parameters('softDeletePolicyDays')]",
+                    "status": "[if(parameters('softDeletePolicyStatusEnabled'), 'enabled', 'disabled')]"
+                  }
+                },
+                "encryption": {
+                  "status": "disabled"
+                },
+                "dataEndpointEnabled": false,
+                "publicNetworkAccess": "Disabled",
+                "networkRuleBypassOptions": "[if(parameters('trustedServicesBypassEnabled'), 'AzureServices', 'None')]",
+                "zoneRedundancy": "[if(parameters('zoneRedundancyEnabled'), 'Enabled', 'Disabled')]",
+                "anonymousPullEnabled": "[parameters('anonymousPullEnabled')]"
+              }
+            },
+            "registry_lock": {
+              "condition": "[and(not(empty(coalesce(parameters('lock'), createObject()))), not(equals(tryGet(parameters('lock'), 'kind'), 'None')))]",
+              "type": "Microsoft.Authorization/locks",
+              "apiVersion": "2020-05-01",
+              "scope": "[format('Microsoft.ContainerRegistry/registries/{0}', parameters('name'))]",
+              "name": "[coalesce(tryGet(parameters('lock'), 'name'), format('lock-{0}', parameters('name')))]",
+              "properties": {
+                "level": "[coalesce(tryGet(parameters('lock'), 'kind'), '')]",
+                "notes": "[if(equals(tryGet(parameters('lock'), 'kind'), 'CanNotDelete'), 'Cannot delete resource or child resources.', 'Cannot delete or modify the resource or child resources.')]"
+              },
+              "dependsOn": [
+                "registry"
+              ]
+            },
+            "privateEndpoint": {
+              "condition": "[not(empty(parameters('subnetId')))]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "[format('{0}-PE', deployment().name)]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "endpointGroupId": {
+                    "value": "[variables('groupId')]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "name": {
+                    "value": "[format('{0}-{1}-PE', parameters('name'), variables('groupId'))]"
+                  },
+                  "serviceId": {
+                    "value": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('name'))]"
+                  },
+                  "subnetId": {
+                    "value": "[parameters('subnetId')]"
+                  },
+                  "tags": {
+                    "value": "[parameters('tags')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "7221841512582795938"
+                    },
+                    "name": "Private Endpoint",
+                    "description": "Private Endpoint used for accessing private resources on POC internal networks",
+                    "owner": "Gullapalli-R"
+                  },
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 64,
+                      "metadata": {
+                        "description": "The resource name."
+                      }
+                    },
+                    "location": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The Geo-location where the resource lives."
+                      }
+                    },
+                    "subnetId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The ID of the subnet from which the private IP will be allocated."
+                      }
+                    },
+                    "serviceId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource id of private link service (the service being linked privately)."
+                      }
+                    },
+                    "tags": {
+                      "type": "object",
+                      "defaultValue": {},
+                      "metadata": {
+                        "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used for viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key with a length no greater than 128 characters and a value with a length no greater than 256 characters."
+                      }
+                    },
+                    "endpointGroupId": {
+                      "type": "string",
+                      "allowedValues": [
+                        "account",
+                        "amlworkspace",
+                        "API",
+                        "application gateway",
+                        "AzureBackup",
+                        "azuremonitor",
+                        "AzureSiteRecovery",
+                        "batchAccount",
+                        "blob",
+                        "blob_secondary",
+                        "browser_authentication",
+                        "Cassandra",
+                        "cluster",
+                        "configurationStores",
+                        "coordinator",
+                        "databricks_ui_api",
+                        "dataFactory",
+                        "Dev",
+                        "dfs",
+                        "dfs_secondary",
+                        "domain",
+                        "DSCAndHybridWorker",
+                        "empty",
+                        "eventHub",
+                        "fhir",
+                        "file",
+                        "File Sync Service",
+                        "file_secondary",
+                        "Gremlin",
+                        "Gateway",
+                        "hosting environment",
+                        "hybridcompute",
+                        "HSM",
+                        "IoTApps",
+                        "iotDps",
+                        "iotHub",
+                        "keydelivery",
+                        "liveevent",
+                        "managed disk",
+                        "management",
+                        "mariadbServer",
+                        "MongoDB",
+                        "mysqlServer",
+                        "namespace",
+                        "nodeManagement",
+                        "portal",
+                        "postgresqlServer",
+                        "Power BI",
+                        "project",
+                        "queue",
+                        "queue_secondary",
+                        "redisCache",
+                        "redisEnterprise",
+                        "registry",
+                        "ResourceManagement",
+                        "searchService",
+                        "signalr",
+                        "sites",
+                        "sites-slot-dev",
+                        "sites-slot-qa",
+                        "sites-slot-testing",
+                        "sites-slot-staging",
+                        "sites-slot-preprod",
+                        "sites-slot-prod",
+                        "SQL",
+                        "SqlOnDemand",
+                        "sqlServer",
+                        "staticSites",
+                        "streamingendpoint",
+                        "Table",
+                        "table",
+                        "table_secondary",
+                        "topic",
+                        "vault",
+                        "web",
+                        "web_secondary",
+                        "Webhook",
+                        "webpubsub",
+                        "grafana",
+                        "prometheusMetrics",
+                        "Bot",
+                        "AzureBackup",
+                        "AzureSiteRecovery",
+                        "managedEnvironments"
+                      ],
+                      "metadata": {
+                        "description": "The ID of the group obtained from the remote resource that this private endpoint should connect to (https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview)."
+                      }
+                    },
+                    "requiresManualApproval": {
+                      "type": "bool",
+                      "defaultValue": false,
+                      "metadata": {
+                        "description": "Whether or not manual approval for a Private Endpoint connection is required."
+                      }
+                    },
+                    "manualApprovalRequestMessage": {
+                      "type": "string",
+                      "defaultValue": "",
+                      "maxLength": 140,
+                      "metadata": {
+                        "description": "Message to pass on when requesting manual endpoint approval workflow."
+                      }
+                    }
+                  },
+                  "variables": {
+                    "privateLinkServiceConnection": {
+                      "name": "[parameters('name')]",
+                      "properties": {
+                        "privateLinkServiceId": "[parameters('serviceId')]",
+                        "groupIds": [
+                          "[parameters('endpointGroupId')]"
+                        ],
+                        "requestMessage": "[if(parameters('requiresManualApproval'), parameters('manualApprovalRequestMessage'), null())]"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/privateEndpoints",
+                      "apiVersion": "2023-11-01",
+                      "name": "[parameters('name')]",
+                      "location": "[parameters('location')]",
+                      "tags": "[parameters('tags')]",
+                      "properties": {
+                        "subnet": {
+                          "id": "[parameters('subnetId')]"
+                        },
+                        "manualPrivateLinkServiceConnections": "[if(parameters('requiresManualApproval'), createArray(variables('privateLinkServiceConnection')), createArray())]",
+                        "privateLinkServiceConnections": "[if(parameters('requiresManualApproval'), createArray(), createArray(variables('privateLinkServiceConnection')))]",
+                        "customNetworkInterfaceName": "[format('{0}-NIC', parameters('name'))]"
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "id": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "ID of the resource."
+                      },
+                      "value": "[resourceId('Microsoft.Network/privateEndpoints', parameters('name'))]"
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Name of the resource."
+                      },
+                      "value": "[parameters('name')]"
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "registry"
+              ]
+            }
+          },
+          "outputs": {
+            "id": {
+              "type": "string",
+              "metadata": {
+                "description": "Identifier for the resource."
+              },
+              "value": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('name'))]"
+            },
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the resource."
+              },
+              "value": "[parameters('name')]"
+            }
+          }
+        }
+      }
+    }
+  },
+  "outputs": {
+    "log": {
+      "$ref": "#/definitions/ResourceItem",
+      "metadata": {
+        "description": "Log Analytics Workspace."
+      },
+      "value": {
+        "name": "[if(parameters('enableLogWorkspace'), reference('log').outputs.name.value, '')]",
+        "id": "[if(parameters('enableLogWorkspace'), reference('log').outputs.id.value, '')]"
+      }
+    },
+    "storage": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ResourceItem"
+      },
+      "metadata": {
+        "description": "Storage Accounts."
+      },
+      "copy": {
+        "count": "[length(if(parameters('enableStorage'), parameters('storage_items'), createArray()))]",
+        "input": {
+          "name": "[reference(format('storage[{0}]', copyIndex())).outputs.name.value]",
+          "id": "[reference(format('storage[{0}]', copyIndex())).outputs.id.value]"
+        }
+      }
+    },
+    "containerRegistry": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ResourceItem"
+      },
+      "metadata": {
+        "description": "Container Registries."
+      },
+      "copy": {
+        "count": "[length(if(parameters('enableContainerRegistry'), parameters('containerRegistry_items'), createArray()))]",
+        "input": {
+          "name": "[reference(format('containerRegistry[{0}]', copyIndex())).outputs.name.value]",
+          "id": "[reference(format('containerRegistry[{0}]', copyIndex())).outputs.id.value]"
+        }
+      }
+    }
+  }
+}
